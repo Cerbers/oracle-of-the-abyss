@@ -1,7 +1,8 @@
 from nltk.corpus import cmudict
 
-# TODO: Add user input via CLI
-# TODO: Save user poems to a file
+# TODO find a way to not count title if poem has one in the text file
+# TODO have line count and syllable count show at end of each stanza
+# TODO have total line count at the bottom of analysis text
 
 d = cmudict.dict()
 vowels = "aeiouy"

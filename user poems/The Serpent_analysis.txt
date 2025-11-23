@@ -1,0 +1,10 @@
+poem: "The Serpent"
+
+In its vastness
+We thrive
+
+In its anger
+We quake
+
+Lines: 5
+Syllables_per_line: [3, 4, 2, 4, 2]

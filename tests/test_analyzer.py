@@ -1,7 +1,7 @@
 from oracle.analyzer import analyze_poem, count_syllables, count_phonetically, fallback_estimate, count_syllables_in_line
-import pytest
 
-# TODO expanbd test cases for edge cases
+# TODO expand test cases for edge cases
+# TODO remake test_count_phonetically to separate tests for words in CMU and not in CMU
 
 def test_count_phonetically():
     """Test the phonetic syllable counting function using CMU Pronouncing Dictionary."""
