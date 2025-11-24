@@ -1,4 +1,5 @@
 from nltk.corpus import cmudict
+from oracle.poem_model import Poem
 
 # TODO find a way to not count title if poem has one in the text file
 # TODO have line count and syllable count show at end of each stanza
@@ -25,7 +26,6 @@ def count_syllables(word: str) -> int:
     if word_lower in d:
         return count_phonetically(word_lower)
     
-
     if "'" in word_lower:
         before, sep, after = word_lower.partition("'")
         if before and after and any(v in vowels for v in before[-1:]) \
@@ -43,7 +43,6 @@ def count_syllables(word: str) -> int:
 def fallback_estimate(word: str) -> int:
     """A simple syllable counting function based on vowel groups."""
 
-    
     count = 0
     in_vowel = False
 
@@ -63,17 +62,35 @@ def count_syllables_in_line(line: str) -> int:
     words = line.split()
     return sum(count_syllables(word) for word in words)
 
-def analyze_poem(poem_text: str) -> dict[str, str | int | list[int]]:
-    """Analyzes a poem - syllables per line, total lines"""
-
-    blank_lines_removed = []
-    for line in poem_text.split('\n'):
+def analyze_poem(poem: Poem) -> dict:
+    lines_with_text = []
+    for line in poem.text.split('\n'):
+        if check_for_title_line(line, poem):
+            continue
         if line.strip():
-            blank_lines_removed.append(line)
-    syllables_per_line = [count_syllables_in_line(line) for line in blank_lines_removed]
+            lines_with_text.append(line)
+
+    syllables_per_line = [count_syllables_in_line(line) for line in lines_with_text]
 
     return {
-        'poem': poem_text,
-        'Lines': len(blank_lines_removed),
-        'Syllables_per_line': syllables_per_line
+        "poem": poem.text,
+        "Lines": len(lines_with_text),
+        "Syllables_per_line": syllables_per_line
     }
+
+def check_for_title_line(line: str, poem: Poem) -> bool:
+    """Check if the poem has a title line enclosed in quotes, all caps, 
+    or if the first line is significantly shorter than the rest and coincides with file name."""
+
+    stripped = line.strip()
+
+    if stripped.startswith('"') and stripped.endswith('"'):
+        return True
+
+    if stripped.isupper():
+        return True
+
+    if stripped == poem.filename:
+        return True
+
+    return False

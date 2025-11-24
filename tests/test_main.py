@@ -1,7 +1,11 @@
+from oracle.poem_model import Poem
 from oracle.main import read_poem_file_and_return_content, write_poem_analysis, read_poem_folder_and_return_names, \
 read_multiple_poem_files_and_write_analyses
 from pathlib import Path
 
+# TODO add test for read_multiple_poem_files_and_write_analyses
+# TODO add test for error handling in read_poem_file_and_return_content
+# TODO rewrite tests to use tmp_path where file writing is involved
 
 def test_read_poem_folder_and_return_names_excludes_analysis_files():
     """Test that analysis files are excluded when reading poem folder."""
@@ -30,23 +34,23 @@ def test_read_poem_file_and_return_content(capsys):
     captured = capsys.readouterr()
     assert poem_content != "", "Failed to read the poem content."
 
-def test_write_poem_analysis():
-    """Test writing poem analysis to a file."""
+def test_write_poem_analysis(tmp_path):
+    poem_content = '''"Voidborn"
+Born out of the void
+Amidst the stars of flesh'''
 
-    poem_analysis_file_path = Path(__file__).parent.parent / "user poems" / "The Serpent_analysis.txt"
-    test_case_poem_path = Path(__file__).parent.parent / "user poems" / "The Serpent.txt"
-    poem_analysis_file = write_poem_analysis(
-        str(test_case_poem_path))
-    
-    assert poem_analysis_file_path.exists(), "Poem analysis file was not created."
-    assert poem_analysis_file is None, "write_poem_analysis should return None."
+    poem_file = tmp_path / "Voidborn.txt"
+    poem_file.write_text(poem_content)
 
-def test_read_multiple_poem_files_and_write_analyses():
-    """Test reading multiple poem files and writing their analyses."""
+    # Now call your real function
+    write_poem_analysis(str(poem_file))
 
-    read_poem_folder_and_return_names("user poems")
+    analysis_file = tmp_path / "Voidborn_analysis.txt"
+    assert analysis_file.exists()
 
-    assert True, "read_multiple_poem_files_and_write_analyses executed without errors."
+    analysis_text = analysis_file.read_text()
+    assert "Lines: 2" in analysis_text
+
 
 def test_poem_files_are_not_empty():
     """Test that when read_poem_folder_and_return_names is called empty files are not included."""

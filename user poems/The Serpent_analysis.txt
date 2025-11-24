@@ -6,5 +6,5 @@ We thrive
 In its anger
 We quake
 
-Lines: 5
-Syllables_per_line: [3, 4, 2, 4, 2]
+Lines: 4
+Syllables_per_line: [4, 2, 4, 2]
