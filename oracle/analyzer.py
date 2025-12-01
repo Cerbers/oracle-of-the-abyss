@@ -31,6 +31,9 @@ def check_for_title_line(line: str, poem: Poem) -> bool:
     if stripped.startswith('"') and stripped.endswith('"'):
         return True
 
+    if stripped.startswith("'") and stripped.endswith("'"):
+        return True
+
     if stripped.isupper():
         return True
 
@@ -38,3 +41,21 @@ def check_for_title_line(line: str, poem: Poem) -> bool:
         return True
 
     return False
+
+def parse_into_stanzas(poem_text: str) -> list[list[str]]:
+    """Parse poem text into stanzas, separated by blank line/s.
+     
+     Function strips leading/trailing whitespace from lines,
+     and handles multiple consecutive blank lines as a single stanza separator.
+     Function returns a list of stanzas, where each stanza is a list of its lines."""
+
+    cleaned_text = '\n'.join(line.strip() for line in poem_text.splitlines())
+
+    stanzas=cleaned_text.split('\n\n')
+
+    result = []
+    for stanza in stanzas:
+        lines = [line.strip() for line in stanza.split('\n') if line.strip()]
+        if lines:
+            result.append(lines)
+    return result

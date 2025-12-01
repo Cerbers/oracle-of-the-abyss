@@ -6,7 +6,7 @@ except LookupError:
         "CMUdict not found. Install it with: python -m nltk.downloader cmudict"
     ) from None
 
-
+# TODO increase accuracy of count_syllables by adding more rules
 
 vowels = "aeiouy"
 
