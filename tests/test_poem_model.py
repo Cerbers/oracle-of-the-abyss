@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from oracle.poem_model import Poem
+from oracle.poem_model import Poem, Word
 
 def test_poem_object():
     """Test the Poem dataclass instantiation and properties."""
@@ -29,3 +29,13 @@ def test_poem_text_variable_breaks_when_not_string():
     
     with pytest.raises(TypeError):
         Poem(text=invalid_text, filepath=poem_path)
+
+def test_word_object():
+
+    case_word = Word(text="example")
+    assert case_word.text == "example", "Word text does not match."
+
+def test_word_syllable_variants():
+
+    case_word = Word(text="rhythm")
+    assert case_word.syllable_variants == [2], "Word syllable variants do not match expected value."

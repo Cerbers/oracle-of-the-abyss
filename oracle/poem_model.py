@@ -1,6 +1,6 @@
 from pathlib import Path
 from dataclasses import dataclass
-
+from oracle.syllable_counter import count_syllables
 
 
 @dataclass
@@ -19,3 +19,13 @@ class Poem:
     @property
     def filename(self) -> str:
         return self.filepath.stem
+
+@dataclass
+class Word:
+    text: str
+
+    @property
+    def syllable_variants(self) -> list[int]:
+
+        
+        return [count_syllables(self.text)]
