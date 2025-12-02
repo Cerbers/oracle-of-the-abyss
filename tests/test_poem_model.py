@@ -60,19 +60,19 @@ def test_line_object():
 def test_line_breaks_line_string_into_words():
     """Test that Line breaks its text into Word objects correctly."""
     case_line = Line(text="Born out of the void")
-    words = case_line.break_line_string_into_words
+    words = case_line.line_chain_of_words
     expected_words = ["Born", "out", "of", "the", "void"]
     assert [word.text for word in words] == expected_words, "Line did not break into expected words."
 
     case_line_2 = Line(text="O'er the abyss' watchful maw")
-    words_2 = case_line_2.break_line_string_into_words
+    words_2 = case_line_2.line_chain_of_words
     expected_words_2 = ["O'er", "the", "abyss'", "watchful", "maw"]
     assert [word.text for word in words_2] == expected_words_2, "Line did not break into expected words."
 
 def test_line_syllable_variants():
     """Test that syllable variants for words in a line are calculated correctly."""
     case_line = Line(text="Born out of the void")
-    words = case_line.break_line_string_into_words
+    words = case_line.line_chain_of_words
     syllable_counts = [word.syllable_variants[0] for word in words]
     expected_syllable_counts = [1, 1, 1, 1, 1]
     assert syllable_counts == expected_syllable_counts, "Line syllable variants do not match expected values."
@@ -82,14 +82,6 @@ def test_line_is_not_empty():
     with pytest.raises(ValueError, match="Line text cannot be empty"):
         Line(text="")
 
-def test_empty_line_creates_no_words():
-    """Test that an empty Line raises an error when trying to break into words."""
-    try:
-        case_line = Line(text="")
-        words = case_line.break_line_string_into_words
-        assert words == [], "Empty line should produce no words."
-    except ValueError:
-        pass  # Expected behavior, as Line should not accept empty text
 
 def test_stanza_object():
     """Test the Stanza dataclass instantiation and properties."""
@@ -123,5 +115,28 @@ def test_poem_object_has_stanzas(tmp_path: Path):
     Gazes into the weary eyes of a lost stalker"""
 
     case_poem = Poem(text=case_poem_text, filepath=tmp_path / "voidborn.txt")
-    stanzas = case_poem.text.split('\n    \n')
+    stanzas = case_poem.stanzas
+
     assert len(stanzas) == 2, "Poem should contain 2 stanzas."
+    assert isinstance(stanzas, list), "Poem stanzas should be a list."
+    assert all(isinstance(stanza, list) for stanza in stanzas), "Each stanza should be a list of lines."
+    assert all(isinstance(line, str) for stanza in stanzas for line in stanza), "Each line in stanzas should be a string."
+
+def test_line_get_syllable_counts_returns_per_word_counts():
+    """Test that the line count function returns the correct number of lines in a poem."""
+    
+    case_line = Line(text="Born out of the void")
+    test_count = case_line.get_syllable_counts()
+    
+    expected_syllable_counts = [1, 1, 1, 1, 1]
+    assert test_count == expected_syllable_counts, "Line syllable variants do not match expected values."
+
+def test_stanza_has_text_representation_by_merging_lines():
+    """Test that Stanza can merge its lines into a single text representation."""
+
+
+    case_stanza_lines = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
+    stanza_text = case_stanza_lines.stanza_text_string
+    expected_text = "First line.\nSecond line." 
+    assert stanza_text == expected_text, "Stanza text representation does not match expected value."
+

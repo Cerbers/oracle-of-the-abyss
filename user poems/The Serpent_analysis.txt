@@ -1,10 +1,12 @@
-poem: "The Serpent"
-
+Stanza 1:
 In its vastness
 We thrive
+Lines: 2
+Syllables per line: [4, 2]
 
+Stanza 2:
 In its anger
 We quake
+Lines: 2
+Syllables per line: [4, 2]
 
-Lines: 4
-Syllables_per_line: [4, 2, 4, 2]

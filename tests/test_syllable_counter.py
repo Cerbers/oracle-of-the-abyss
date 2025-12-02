@@ -1,16 +1,8 @@
-from oracle.syllable_counter import count_syllables_in_line, count_phonetically, fallback_estimate, count_syllables
+from oracle.syllable_counter import count_phonetically, fallback_estimate, count_syllables
 
 # TODO remake test_count_phonetically to separate tests for words in CMU and not in CMU
 
-def test_count_syllables_in_line():
-    """Test the syllable counting function for a line of text."""
 
-    line_1 = "O'er the abyss' watchful maw"
-    expected_count_1 = 7
-    line_2 = "Born out of the void"
-    expected_count_2 = 5
-    assert count_syllables_in_line(line_1) == expected_count_1
-    assert count_syllables_in_line(line_2) == expected_count_2
 
 def test_count_phonetically():
     """Test the phonetic syllable counting function using CMU Pronouncing Dictionary."""

@@ -37,7 +37,6 @@ def read_poem_file_and_return_content(file_path: str) -> str:
         return ""
     
 def write_poem_analysis(file_path: str) -> None:
-
     input_path = Path(file_path)
 
     poem_text = read_poem_file_and_return_content(file_path)
@@ -47,8 +46,18 @@ def write_poem_analysis(file_path: str) -> None:
     
     output_path = input_path.with_name(input_path.stem + "_analysis.txt")
     with open(output_path, 'w', encoding='utf-8') as file:
-        for key, value in analysis_result.items():
-            file.write(f"{key}: {value}\n")
+        # Iterate through each stanza's data together
+        for i, (text, line_count, syllables) in enumerate(
+            zip(
+                analysis_result['stanza_texts'],
+                analysis_result['line_counts'],
+                analysis_result['syllables_per_line']
+            ), start=1
+        ):
+            file.write(f"Stanza {i}:\n")
+            file.write(f"{text}\n")
+            file.write(f"Lines: {line_count}\n")
+            file.write(f"Syllables per line: {syllables}\n\n")
 
 def read_multiple_poem_files_and_write_analyses() -> None:
     """Reads multiple poem files from 'user poems' folder and writes their analyses."""

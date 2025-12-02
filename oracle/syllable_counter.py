@@ -57,9 +57,3 @@ def fallback_estimate(word: str) -> int:
             in_vowel = False
 
     return count
-
-def count_syllables_in_line(line: str) -> int:
-    """Count syllables in a line of text"""
-
-    words = line.split()
-    return sum(count_syllables(word) for word in words)

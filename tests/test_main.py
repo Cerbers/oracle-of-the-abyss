@@ -42,14 +42,17 @@ Amidst the stars of flesh'''
     poem_file = tmp_path / "Voidborn.txt"
     poem_file.write_text(poem_content)
 
-    # Now call your real function
     write_poem_analysis(str(poem_file))
 
     analysis_file = tmp_path / "Voidborn_analysis.txt"
     assert analysis_file.exists()
 
     analysis_text = analysis_file.read_text()
+    # Check for formatted stanza output
+    assert "Stanza 1:" in analysis_text
+    assert "Born out of the void" in analysis_text
     assert "Lines: 2" in analysis_text
+    assert "Syllables per line:" in analysis_text
 
 
 def test_poem_files_are_not_empty():
