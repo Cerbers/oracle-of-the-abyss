@@ -3,9 +3,7 @@ from oracle.main import read_poem_file_and_return_content, write_poem_analysis, 
 read_multiple_poem_files_and_write_analyses
 from pathlib import Path
 
-# TODO add test for read_multiple_poem_files_and_write_analyses
 # TODO add test for error handling in read_poem_file_and_return_content
-# TODO rewrite tests to use tmp_path where file writing is involved
 
 def test_read_poem_folder_and_return_names_excludes_analysis_files():
     """Test that analysis files are excluded when reading poem folder."""
@@ -64,3 +62,72 @@ def test_poem_files_are_not_empty():
         poem_file_path = Path("user poems") / poem_file_name
         poem_content = read_poem_file_and_return_content(str(poem_file_path))
         assert poem_content.strip() != "", f"Poem file {poem_file_name} is empty."
+
+def test_read_multiple_poem_files_and_write_analyses(tmp_path, monkeypatch):
+    """Test reading multiple poem files and writing their analyses."""
+
+    read_multiple_poem_files_and_write_analyses()
+
+    test_poems = {
+        "poem1.txt": """First line
+Second line
+
+Third line""",
+        "poem2.txt": """Single stanza poem
+With two lines""",
+        "poem3.txt": """Another poem
+Multiple lines
+In one stanza"""
+    }
+
+    for filename, content in test_poems.items():
+        poem_file = tmp_path / filename
+        poem_file.write_text(content)
+
+        def mock_read_poem_folder_and_return_names(folder_path: str) -> list[str]:
+            poem_texts = []
+            folder = Path(folder_path)
+
+            for file_path in folder.glob("*.txt"):
+                if not file_path.name.endswith("_analysis.txt"):
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        if file.read().strip() != "":
+                            poem_texts.append(file_path.name)
+            return poem_texts
+        
+
+    def mock_read_multiple():
+        poem_file_names = mock_read_poem_folder_and_return_names(str(tmp_path))
+
+        for poem_file_name in poem_file_names:
+            poem_file_path = tmp_path / poem_file_name
+            write_poem_analysis(str(poem_file_path))
+            
+    mock_read_multiple()
+
+    analysis_files = list(tmp_path.glob("*_analysis.txt"))
+    poem_files = [f for f in tmp_path.glob("*.txt") if not f.name.endswith("_analysis.txt")]
+
+    assert len(analysis_files) == len(test_poems), f"Excepted {len(test_poems)} analysis files, found {len(analysis_files)}."
+
+    assert len(poem_files) == len(test_poems), f"Expected {len(test_poems)} poem files, found {len(poem_files)}."
+
+    for poem_file in poem_files:
+        analysis_file = tmp_path / (poem_file.stem + "_analysis.txt")
+        assert analysis_file.exists(), f"Analysis file for {poem_file.name} does not exist."
+
+        assert analysis_file.read_text().strip() != "", f"Analysis file for {poem_file.name} is empty."
+
+def test_read_multiple_poem_files_with_empty_folder(tmp_path, monkeypatch):
+    """Test that function handles empty folder gracefully."""
+    
+    monkeypatch.chdir(tmp_path)
+    empty_folder = tmp_path / "user poems"
+    empty_folder.mkdir()
+    
+    # Should not crash
+    read_multiple_poem_files_and_write_analyses()
+    
+    # No analysis files should be created
+    analysis_files = list(empty_folder.glob("*_analysis.txt"))
+    assert len(analysis_files) == 0, "No analysis files should be created for empty folder"

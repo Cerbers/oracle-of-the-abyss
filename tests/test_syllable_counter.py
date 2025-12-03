@@ -2,8 +2,6 @@ from oracle.syllable_counter import count_phonetically, fallback_estimate, count
 
 # TODO remake test_count_phonetically to separate tests for words in CMU and not in CMU
 
-
-
 def test_count_phonetically():
     """Test the phonetic syllable counting function using CMU Pronouncing Dictionary."""
 
