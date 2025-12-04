@@ -1,0 +1,19 @@
+oracle/__pycache__/main.cpython-313.pyc
+oracle/__pycache__/__init__.cpython-313.pyc
+tests/__pycache__/__init__.cpython-313.pyc
+tests/__pycache__/test_analyzer.cpython-313-pytest-8.4.1.pyc
+tests/__pycache__/test_analyzer.cpython-313-pytest-9.0.1.pyc
+tests/__pycache__/test_main.cpython-313-pytest-9.0.0.pyc
+oracle/__pycache__/analyzer.cpython-313.pyc
+.vscode/settings.json
+user poems/Tarot.txt
+user poems/Tarot_analysis.txt
+tests/__pycache__/test_user_interaction.cpython-313-pytest-9.0.1.pyc
+oracle/__pycache__/poem_model.cpython-313.pyc
+*.pyc
+__pycache__/
+user poems/True Void.txt
+*analysis.txt
+user poems/Awakening.txt
+user poems/Train of fragments.txt
+user poems/does it break.txt
