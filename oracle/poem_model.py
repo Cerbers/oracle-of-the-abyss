@@ -12,7 +12,7 @@ class Poem:
     text: str
     filepath: Path
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.text, str):
             raise TypeError("text must be a string")
 

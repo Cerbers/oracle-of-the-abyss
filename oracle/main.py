@@ -1,6 +1,7 @@
 from oracle.analyzer import analyze_poem
 from pathlib import Path
 from oracle.poem_model import Poem
+from oracle.intern.lookout import watch_running_time_of_function
 
 # TODO improve read_poem_file_and_return_content with error handling
 # TODO improve write_poem_analysis to format analysis nicely
@@ -9,7 +10,8 @@ from oracle.poem_model import Poem
 
 
 def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
-    """ Reads only .txt files' names from the specified folder and returns a list that contains names of those files."""
+    """    Reads only .txt files' names from the specified folder and returns a 
+    list that contains names of those files."""
 
     poem_texts = []
     folder = Path(folder_path)
@@ -59,6 +61,8 @@ def write_poem_analysis(file_path: str) -> None:
             file.write(f"Lines: {line_count}\n")
             file.write(f"Syllables per line: {syllables}\n\n")
 
+
+# @watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses() -> None:
     """Reads multiple poem files from 'user poems' folder and writes their analyses."""
 

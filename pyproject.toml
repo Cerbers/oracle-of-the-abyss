@@ -1,24 +1,19 @@
-[project]
+[tool.poetry]
 name = "oracle-of-the-abyss"
 version = "0.1.0"
 description = "poem analyzer program aimed at counting syllables, stanzas, lines, checking rhyme scheme, etc."
-authors = [
-    {name = "Magister Opiter",email = "cerberkan@gmail.com"}
-]
-license = {text = "MIT"}
+authors = ["Magister Opiter <cerberkan@gmail.com>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "nltk (>=3.9.2,<4.0.0)",
-]
 
+[tool.poetry.dependencies]
+python = "^3.13"
+nltk = "^3.9.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+mypy = "^1.18.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[dependency-groups]
-dev = [
-    "pytest (>=9.0.1,<10.0.0)",
-    "mypy (>=1.18.2,<2.0.0)"
-]

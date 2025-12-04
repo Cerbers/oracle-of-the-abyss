@@ -8,14 +8,14 @@ class Word:
 
     @property
     def syllable_variants(self) -> list[int]:
-        return [count_syllables(self.text)]
+        return count_syllables(self.text)
 
 
 @dataclass
 class Line:
     text: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.text:
             raise ValueError("Line text cannot be empty")
         
@@ -35,7 +35,7 @@ class Line:
 class Stanza:
     lines: list[Line]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.lines:
             raise ValueError("Stanza must contain at least one Line")
     

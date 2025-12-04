@@ -1,6 +1,10 @@
 from oracle.poem_model import Poem
+from oracle.intern.lookout import watch_running_time_of_function
 
-def analyze_poem(poem: Poem) -> dict[str, list]:
+
+
+# @watch_running_time_of_function
+def analyze_poem(poem: Poem) -> dict[str, list[str] | list[int] | list[list[int]]]:
     """Analyze poem using domain objects for flexible syllable pattern detection."""
     
     stanza_texts = []

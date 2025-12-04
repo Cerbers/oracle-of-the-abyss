@@ -2,9 +2,9 @@ from oracle.syllable_counter import count_phonetically, fallback_estimate, count
 
 # TODO remake test_count_phonetically to separate tests for words in CMU and not in CMU
 
-def test_count_phonetically():
+def test_count_phonetically(): # needs updating
     """Test the phonetic syllable counting function using CMU Pronouncing Dictionary."""
-
+    
     not_cmu_word_count = 0
     in_cmu_word_count = 0
     test_cases = {
@@ -19,7 +19,7 @@ def test_count_phonetically():
     for word, expected_count in test_cases.items():
         print(f"Testing phonetic count for word: {word}")
         try:
-            assert count_phonetically(word) == expected_count
+            assert count_phonetically(word)[0] == expected_count
             in_cmu_word_count += 1
         except KeyError:
             not_cmu_word_count += 1
@@ -42,9 +42,9 @@ def test_fallback_estimate():
     for word, expected_count in test_cases.items():
         assert fallback_estimate(word) == expected_count
 
-def test_count_syllables():
+def test_count_syllables(): #needs updating
     """Test the syllable counting function for individual words."""
-
+    # right now it only returns one int, but it should return list[int] of all variants instead
     test_cases = {
         "illusion": 3,
         "abyss'": 2,
@@ -59,5 +59,4 @@ def test_count_syllables():
         "jumped": 1
     }
     for word, expected_count in test_cases.items():
-        print(f"Testing word: {word}")
-        assert count_syllables(word) == expected_count
+        assert count_syllables(word)[0] == expected_count
