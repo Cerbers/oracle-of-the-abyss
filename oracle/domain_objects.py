@@ -26,8 +26,8 @@ class Line:
     def line_chain_of_words(self) -> list[Word]:
         words_in_line = self.text.split()
         return [Word(text=word) for word in words_in_line]
-
-    def get_syllable_counts(self) -> list[int]:
+    # HACK needs updating to return list of all variants
+    def get_syllable_counts(self) -> list[int]: # needs updating
         return [word.syllable_variants[0] for word in self.line_chain_of_words]
 
 

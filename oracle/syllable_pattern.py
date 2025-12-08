@@ -21,3 +21,4 @@ def pull_single_syllable_variant_from_words(words: list[str]) -> list[str]:
 
 
 # BASE ALGORITHM FOR SIMPLE SYLLABLE PATTERN DETECTION
+

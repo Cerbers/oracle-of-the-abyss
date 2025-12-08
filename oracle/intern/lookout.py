@@ -2,7 +2,7 @@ import time
 from functools import wraps
 from typing import Callable, TypeVar, ParamSpec
 
-Parameters = ParamSpec('P')
+Parameters = ParamSpec('Parameters')
 Result = TypeVar('Result')
 
 def watch_running_time_of_function(func: Callable[Parameters, Result]) -> Callable[Parameters, Result]:

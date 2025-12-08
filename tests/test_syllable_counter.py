@@ -1,31 +1,19 @@
 from oracle.syllable_counter import count_phonetically, fallback_estimate, count_syllables
 
-# TODO remake test_count_phonetically to separate tests for words in CMU and not in CMU
 
-def test_count_phonetically(): # needs updating
+def test_count_phonetically():
     """Test the phonetic syllable counting function using CMU Pronouncing Dictionary."""
     
-    not_cmu_word_count = 0
-    in_cmu_word_count = 0
     test_cases = {
-        "illusion": 3,
-        "abyss": 2,
-        "flesh": 1,
-        "o'er": 1,
-        "watchful": 2,
-        "maw": 1,
-        "make": 1
+        "hello": [2, 2], # multiple pronunciations but same syllable count
+        "world": [1],
+        "syllable": [3],
+        "test": [1],
+        "fire": [2, 1],  # multiple pronunciations
+        "our": [2, 1, 1]    # multiple pronunciations
     }
-    for word, expected_count in test_cases.items():
-        print(f"Testing phonetic count for word: {word}")
-        try:
-            assert count_phonetically(word)[0] == expected_count
-            in_cmu_word_count += 1
-        except KeyError:
-            not_cmu_word_count += 1
-            
-    assert not_cmu_word_count == 1
-    assert in_cmu_word_count == len(test_cases) - 1
+    for word, expected_counts in test_cases.items():
+        assert count_phonetically(word) == expected_counts
 
 
 def test_fallback_estimate():

@@ -7,15 +7,18 @@ except LookupError:
     ) from None
 
 # TODO increase accuracy of count_syllables by adding more rules
-# TODO: make count_syllables return list[int] of all variants instead of just one int
+# TODO: make count_syllables return list[int] of all variants instead of just one int once syllable_pattern is fully functional
 # TODO: make count_phonetically return list of unique syllable counts instead of all variants
 vowels = "aeiouy"
 
 def count_phonetically(word: str) -> list[int]:
     """"Count syllables in a word using CMU Pronouncing Dictionary."""
-    return [len([ph for ph in pron if ph[-1].isdigit()]) for pron in DICTIONARY_CMUDICT[word]]
-
-
+    syllable_counts = []
+    for pronunciation in DICTIONARY_CMUDICT[word]:
+        syllable_count = len([phoneme for phoneme in pronunciation if phoneme[-1].isdigit()])
+        syllable_counts.append(syllable_count)
+    
+    return syllable_counts
 
 def count_syllables(word: str) -> list[int]:
     """Count syllables in a word using CMU Pronouncing Dictionary, 
@@ -23,11 +26,11 @@ def count_syllables(word: str) -> list[int]:
     If all else fails, use a simple vowel counting method."""
 
     if word in DICTIONARY_CMUDICT:
-        return [count_phonetically(word)][0]
+        return count_phonetically(word)
     word_lower = word.lower()
 
     if word_lower in DICTIONARY_CMUDICT:
-        return [count_phonetically(word_lower)][0]
+        return count_phonetically(word_lower)
     
     if "'" in word_lower:
         before, sep, after = word_lower.partition("'")
@@ -39,7 +42,7 @@ def count_syllables(word: str) -> list[int]:
     word_stripped = word_lower.strip(".,;:!?\"'()[]{}")
 
     if word_stripped in DICTIONARY_CMUDICT:
-        return [count_phonetically(word_stripped)][0]
+        return count_phonetically(word_stripped)
     else:
         return [fallback_estimate(word_stripped)]
 
