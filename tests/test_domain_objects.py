@@ -80,5 +80,77 @@ def test_stanza_has_text_representation_by_merging_lines():
 
     case_stanza_lines = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
     stanza_text = case_stanza_lines.stanza_text_string
-    expected_text = "First line.\nSecond line." 
+    expected_text = "First line.\nSecond line."
     assert stanza_text == expected_text, "Stanza text representation does not match expected value."
+
+
+def test_line_get_unique_variants():
+    """Test that _get_unique_variants removes duplicates while preserving order."""
+    line = Line(text="test")
+
+    # Test with duplicates at end
+    assert line._get_unique_variants([2, 1, 1]) == [2, 1]
+
+    # Test with all duplicates
+    assert line._get_unique_variants([2, 2]) == [2]
+
+    # Test with single element
+    assert line._get_unique_variants([1]) == [1]
+
+    # Test with multiple duplicates scattered
+    assert line._get_unique_variants([3, 2, 1, 2, 3]) == [3, 2, 1]
+
+
+def test_line_get_syllable_counts_default_unchanged():
+    """Test that default behavior returns first variant only (backwards compatible)."""
+    case_line = Line(text="Born out of the void")
+    counts = case_line.get_syllable_counts()
+
+    # Should return first variant for each word
+    assert counts == [1, 1, 1, 1, 1]
+    assert isinstance(counts, list)
+    assert all(isinstance(c, int) for c in counts)
+
+
+def test_line_get_syllable_counts_all_variants():
+    """Test that use_all_variants=True returns unique variants per word."""
+    case_line = Line(text="fire our")
+    counts = case_line.get_syllable_counts(use_all_variants=True)
+
+    # fire=[2,1], our=[2,1,1]→[2,1] after deduplication
+    assert counts == [[2, 1], [2, 1]]
+    assert isinstance(counts, list)
+    assert all(isinstance(c, list) for c in counts)
+
+
+def test_line_get_total_syllables_default_unchanged():
+    """Test that default behavior returns sum (backwards compatible)."""
+    case_line = Line(text="Born out of the void")
+    total = case_line.get_total_syllables()
+
+    assert total == 5
+    assert isinstance(total, int)
+
+
+def test_line_get_total_syllables_all_variants():
+    """Test that use_all_variants=True returns nested structure."""
+    case_line = Line(text="fire our")
+    variants = case_line.get_total_syllables(use_all_variants=True)
+
+    # Should return the same structure as get_syllable_counts(use_all_variants=True)
+    assert variants == [[2, 1], [2, 1]]
+    assert isinstance(variants, list)
+    assert all(isinstance(v, list) for v in variants)
+
+
+def test_line_all_variants_edge_cases():
+    """Test edge cases for all variants mode."""
+    # Single word with variants
+    case_line_single = Line(text="fire")
+    variants_single = case_line_single.get_total_syllables(use_all_variants=True)
+    assert variants_single == [[2, 1]]
+
+    # All single-variant words should still return nested structure
+    case_line_simple = Line(text="test")  # test=[1]
+    variants_simple = case_line_simple.get_total_syllables(use_all_variants=True)
+    assert variants_simple == [[1]]

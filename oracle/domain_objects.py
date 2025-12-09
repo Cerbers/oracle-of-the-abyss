@@ -19,16 +19,56 @@ class Line:
         if not self.text:
             raise ValueError("Line text cannot be empty")
         
-    def get_total_syllables(self) -> int:
-        return sum(self.get_syllable_counts())
+    def get_total_syllables(self, use_all_variants: bool = False) -> int | list[list[int]]:
+        """
+        Calculate total syllables for the line.
+
+        Args:
+            use_all_variants: If False (default), returns sum of first variants.
+                             If True, returns nested list for pattern analysis.
+
+        Returns:
+            When False: 5 (sum of first variants)
+            When True: [[2,1], [2,1]] (unique variants per word)
+        """
+        if use_all_variants:
+            return self.get_syllable_counts(use_all_variants=True)
+        else:
+            return sum(self.get_syllable_counts(use_all_variants=False))
 
     @property
     def line_chain_of_words(self) -> list[Word]:
         words_in_line = self.text.split()
         return [Word(text=word) for word in words_in_line]
-    # HACK needs updating to return list of all variants
-    def get_syllable_counts(self) -> list[int]: # needs updating
-        return [word.syllable_variants[0] for word in self.line_chain_of_words]
+
+    def get_syllable_counts(self, use_all_variants: bool = False) -> list[int] | list[list[int]]:
+        """
+        Get syllable counts for words in the line.
+
+        Args:
+            use_all_variants: If False (default), returns first variant only.
+                             If True, returns all unique variants per word.
+
+        Returns:
+            When False: [1, 2, 1] (first variant per word)
+            When True: [[1], [2,1], [1]] (unique variants per word)
+        """
+        if use_all_variants:
+            return [self._get_unique_variants(word.syllable_variants)
+                    for word in self.line_chain_of_words]
+        else:
+            return [word.syllable_variants[0] for word in self.line_chain_of_words]
+
+    @staticmethod
+    def _get_unique_variants(variants: list[int]) -> list[int]:
+        """Remove duplicate syllable counts while preserving order."""
+        seen = set()
+        unique = []
+        for variant in variants:
+            if variant not in seen:
+                seen.add(variant)
+                unique.append(variant)
+        return unique
 
 
 @dataclass
