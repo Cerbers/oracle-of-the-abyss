@@ -1,6 +1,6 @@
 # Oracle
 
-A Python poetry analysis tool that counts syllables and identifies metrical patterns in poems.
+A Python poetry analysis tool that counts syllables and identifies potential metrical patterns in poems.
 
 ## Overview
 
@@ -127,10 +127,13 @@ poetry run pytest
 
 ### Project Principles
 
-This project follows test-driven development (TDD) with:
-- Comprehensive test coverage before implementation
-- Maximum 1 level of inheritance
-- Modular architecture over quick fixes
+This project emphasizes correctness, clarity, and incremental design.
+Testing is used as a safety net and as executable documentation of expected behavior, rather than strict test-first development in all areas.
+
+- Tests are added when behavior becomes clear and stable  
+- Exploratory implementation may precede tests for heuristic or algorithmic components  
+- Architecture favors modular design and explicit domain objects over quick fixes  
+- Inheritance is kept shallow (maximum one level) in favor of composition
 
 ## Technical Details
 

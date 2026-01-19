@@ -1,24 +1,17 @@
-from oracle.syllable_counter import DICTIONARY_CMUDICT
 
+# Conditions for syllable pattern detection
+# If a stanza in a poem has all lines with same syllable count, then the confidence raises by 1
+# If a stanza has less than 50% of lines with the same syllable count, then the confidence drops by 1
 
-# note: this function is meant to pull words that have only one syllable variant
-# the word object must be called for words that do not have single syllable variants
-# comment to be deleted after implementing word object usage throughout the codebase
-def pull_single_syllable_variant_from_words(words: list[str]) -> list[str]:
-    """
-    After receiving a list of words, return only those words that have a single syllable variant.
-    If a word has more than 1 syllable pronunciation variant and the variants have different syllable counts,
-    it is excluded from the returned list.
-    """
-    
-    single_syllable_variants = []
-    for word in words:
-        if word in DICTIONARY_CMUDICT:
-            syllable_counts = set(len([ph for ph in pronunciation if ph[-1].isdigit()]) for pronunciation in DICTIONARY_CMUDICT[word])
-            if len(syllable_counts) == 1:
-                single_syllable_variants.append(word)
-    return single_syllable_variants
+confidence = 0
 
+def confidence_up():
+    global confidence
+    confidence += 1
+
+def confidence_down():
+    global confidence
+    confidence -= 1
 
 # BASE ALGORITHM FOR SIMPLE SYLLABLE PATTERN DETECTION
 

@@ -8,8 +8,7 @@ except LookupError:
 
 # TODO increase accuracy of count_syllables by adding more rules
 # TODO: make count_syllables return list[int] of all variants instead of just one int once syllable_pattern is fully functional
-# TODO: make count_phonetically return list of unique syllable counts instead of all variants
-vowels = "aeiouy"
+VOWELS = "aeiouy"
 
 def count_phonetically(word: str) -> list[int]:
     """"Count syllables in a word using CMU Pronouncing Dictionary."""
@@ -34,8 +33,8 @@ def count_syllables(word: str) -> list[int]:
     
     if "'" in word_lower:
         before, sep, after = word_lower.partition("'")
-        if before and after and any(v in vowels for v in before[-1:]) \
-            and any(v in vowels for v in after[:1]):
+        if before and after and any(v in VOWELS for v in before[-1:]) \
+            and any(v in VOWELS for v in after[:1]):
             # it is a real elision -> fallback and subtract 1
             return [fallback_estimate(word_lower) - 1]
     
@@ -53,7 +52,7 @@ def fallback_estimate(word: str) -> int:
     in_vowel = False
 
     for char in word:
-        if char in vowels:
+        if char in VOWELS:
             if not in_vowel:
                 count += 1
                 in_vowel = True

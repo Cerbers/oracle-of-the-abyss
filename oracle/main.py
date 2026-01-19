@@ -63,13 +63,13 @@ def write_poem_analysis(file_path: str) -> None:
 
 
 # @watch_running_time_of_function
-def read_multiple_poem_files_and_write_analyses() -> None:
+def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
     """Reads multiple poem files from 'user poems' folder and writes their analyses."""
 
-    poem_file_names = read_poem_folder_and_return_names("user poems")
+    poem_file_names = read_poem_folder_and_return_names(folder_path)
 
     for poem_file_name in poem_file_names:
-        poem_file_path = Path("user poems") / poem_file_name
+        poem_file_path = Path(folder_path) / poem_file_name
         write_poem_analysis(str(poem_file_path))
 
 

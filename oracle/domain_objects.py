@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from functools import cached_property
 from oracle.syllable_counter import count_syllables
+from typing import cast, List
 
 
 @dataclass
@@ -19,27 +21,16 @@ class Line:
         if not self.text:
             raise ValueError("Line text cannot be empty")
         
-    def get_total_syllables(self, use_all_variants: bool = False) -> int | list[list[int]]:
-        """
-        Calculate total syllables for the line.
-
-        Args:
-            use_all_variants: If False (default), returns sum of first variants.
-                             If True, returns nested list for pattern analysis.
-
-        Returns:
-            When False: 5 (sum of first variants)
-            When True: [[2,1], [2,1]] (unique variants per word)
-        """
-        if use_all_variants:
-            return self.get_syllable_counts(use_all_variants=True)
-        else:
-            return sum(self.get_syllable_counts(use_all_variants=False))
-
-    @property
-    def line_chain_of_words(self) -> list[Word]:
-        words_in_line = self.text.split()
-        return [Word(text=word) for word in words_in_line]
+        # Used by default in analyzer
+    def get_total_syllables(self) -> int:
+        """Calculate total syllables for the line (sum of first variants)."""
+        counts = self.get_syllable_counts(use_all_variants=False)
+        return sum(cast(List[int], counts))
+    
+        # To be used by syllable matching pattern
+    def get_all_syllable_variants(self) -> list[list[int]]:
+        """Get all unique syllable variants per word for pattern analysis."""
+        return cast(List[List[int]], self.get_syllable_counts(use_all_variants=True))
 
     def get_syllable_counts(self, use_all_variants: bool = False) -> list[int] | list[list[int]]:
         """
@@ -58,6 +49,11 @@ class Line:
                     for word in self.line_chain_of_words]
         else:
             return [word.syllable_variants[0] for word in self.line_chain_of_words]
+        
+    @property
+    def line_chain_of_words(self) -> list[Word]:
+        words_in_line = self.text.split()
+        return [Word(text=word) for word in words_in_line]
 
     @staticmethod
     def _get_unique_variants(variants: list[int]) -> list[int]:

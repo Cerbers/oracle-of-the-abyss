@@ -132,10 +132,10 @@ def test_line_get_total_syllables_default_unchanged():
     assert isinstance(total, int)
 
 
-def test_line_get_total_syllables_all_variants():
-    """Test that use_all_variants=True returns nested structure."""
+def test_line_get_all_syllable_variants():
+    """Test that get_all_syllable_variants returns nested structure."""
     case_line = Line(text="fire our")
-    variants = case_line.get_total_syllables(use_all_variants=True)
+    variants = case_line.get_all_syllable_variants()
 
     # Should return the same structure as get_syllable_counts(use_all_variants=True)
     assert variants == [[2, 1], [2, 1]]
@@ -147,10 +147,10 @@ def test_line_all_variants_edge_cases():
     """Test edge cases for all variants mode."""
     # Single word with variants
     case_line_single = Line(text="fire")
-    variants_single = case_line_single.get_total_syllables(use_all_variants=True)
+    variants_single = case_line_single.get_all_syllable_variants()
     assert variants_single == [[2, 1]]
 
     # All single-variant words should still return nested structure
     case_line_simple = Line(text="test")  # test=[1]
-    variants_simple = case_line_simple.get_total_syllables(use_all_variants=True)
+    variants_simple = case_line_simple.get_all_syllable_variants()
     assert variants_simple == [[1]]
