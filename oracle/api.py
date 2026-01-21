@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from pathlib import Path
+from typing import List
 from oracle.analyzer import analyze_poem
 from oracle.poem_model import Poem
 
@@ -13,6 +14,14 @@ app = FastAPI(
 class PoemRequest(BaseModel):
     poem_text: str
     title: str = "Untitled"
+
+class BatchPoemRequest(BaseModel):
+    poems: List[PoemRequest]
+
+class PoemAnalysisResult(BaseModel):
+    title: str
+    analysis: dict
+    error: str | None = None
 
 
 @app.get("/")
@@ -45,3 +54,54 @@ def analyze_endpoint(request: PoemRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+    
+@app.post("/batch-analyze")
+def batch_analyze_endpoint(request: BatchPoemRequest):
+    """
+    Analyze multiple poems in a single request.
+
+    Returns a list of results, one for each poem.
+    If a poem fails to analyze, ist error field will contain the error message.
+    """
+    results = []
+
+    for poem_request in request.poems:
+        try:
+            poem = Poem(
+                text=poem_request.poem_text,
+                filepath=Path(f"{poem_request.title}.txt")
+            )
+            analysis = analyze_poem(poem)
+            results.append(PoemAnalysisResult(
+                title=poem_request.title,
+                analysis=analysis,
+                error=None
+            ))
+        except Exception as e:
+            results.append(PoemAnalysisResult(
+                title=poem_request.title,
+                analysis={},
+                error=str(e)
+            ))
+    return {"results": results, "total": len(results)}
+
+    
+@app.get("/health")
+def health_check():
+    """Check if the API and its dependencies are running properly."""
+
+    try:
+        #Test that syllable counter is accessible
+        from oracle.syllable_counter import count_syllables
+        test_count = count_syllables("test")
+
+        return {
+            "status": "healthy",
+            "syllable_counter": "operational",
+            "cmu_dict": "loaded"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }
