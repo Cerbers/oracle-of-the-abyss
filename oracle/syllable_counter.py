@@ -1,10 +1,12 @@
+import nltk # type: ignore[import-untyped]
 from nltk.corpus import cmudict # type: ignore[import-untyped]
+
+
 try:
     DICTIONARY_CMUDICT = cmudict.dict()
 except LookupError:
-    raise RuntimeError(
-        "CMUdict not found. Install it with: python -m nltk.downloader cmudict"
-    ) from None
+    nltk.download('cmudict', quiet=True)
+    DICTIONARY_CMUDICT = cmudict.dict()
 
 # TODO increase accuracy of count_syllables by adding more rules
 # TODO: make count_syllables return list[int] of all variants instead of just one int once syllable_pattern is fully functional
