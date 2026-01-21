@@ -11,3 +11,5 @@ user poems/does it break.txt
 .coverage
 cloc.exe
 cloc
+.claude/settings.local.json
+user poems/The Dominion of Lies.txt
