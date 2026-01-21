@@ -1,0 +1,9 @@
+﻿services:
+  - type: web
+    name: oracle-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python -m nltk.downloader cmudict
+    startCommand: uvicorn oracle.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
