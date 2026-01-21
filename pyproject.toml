@@ -16,6 +16,11 @@ pytest = "^8.0.0"
 mypy = "^1.18.0"
 pytest-cov = "^7.0.0"
 
+[tool.coverage.run]
+omit = [
+    "oracle/intern/*",
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

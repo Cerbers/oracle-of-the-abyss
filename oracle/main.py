@@ -1,5 +1,6 @@
 from oracle.analyzer import analyze_poem
 from pathlib import Path
+from oracle.devices import holder_for_poetic_device_analysis
 from oracle.poem_model import Poem
 from oracle.intern.lookout import watch_running_time_of_function
 
@@ -44,6 +45,9 @@ def write_poem_analysis(file_path: str) -> None:
     poem_text = read_poem_file_and_return_content(file_path)
     poem_obj = Poem(text=poem_text, filepath=input_path)
 
+    # WiP poetic device analysis
+    poetic_devices_found = holder_for_poetic_device_analysis(poem_obj)
+
     analysis_result = analyze_poem(poem_obj)
     
     output_path = input_path.with_name(input_path.stem + "_analysis.txt")
@@ -60,6 +64,8 @@ def write_poem_analysis(file_path: str) -> None:
             file.write(f"{text}\n")
             file.write(f"Lines: {line_count}\n")
             file.write(f"Syllables per line: {syllables}\n\n")
+        for device in poetic_devices_found:
+            file.write(f"Anaphora found: {device}\n")
 
 
 # @watch_running_time_of_function
