@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 from typing import List
@@ -10,6 +11,16 @@ app = FastAPI(
     description="Analyze poems for syllable counts and structure.",
     version="0.1.0"
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 class PoemRequest(BaseModel):
     poem_text: str
