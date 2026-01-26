@@ -122,19 +122,20 @@ def health_check():
         }
 
 # Serve built frontend (dist folder from root)
-DIST_DIR = Path(__file__).parent.parent / "frontend" / "dist"
+DIST_DIR = Path(__file__).parent.parent / "dist"
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
-    # If it's an actual file in dist (e.g., assets, favicon), serve it
+    dist_resolved = DIST_DIR.resolve()
     file_path = (DIST_DIR / full_path).resolve()
-    if file_path.is_file() and str(file_path).startswith(str(DIST_DIR)):
+    
+    # Security check: ensure we're not serving files outside dist
+    if file_path.is_file() and str(file_path).startswith(str(dist_resolved)):
         return FileResponse(file_path)
     
-    # Otherwise (SPA routing), serve index.html
-    index_path = DIST_DIR / "index.html"
+    # SPA fallback: serve index.html
+    index_path = dist_resolved / "index.html"
     if index_path.is_file():
         return FileResponse(index_path)
     
-    # Fallback error if dist missing
     return {"error": "Frontend not found"}
