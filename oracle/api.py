@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
 from typing import List
@@ -38,7 +39,7 @@ class PoemAnalysisResult(BaseModel):
     error: str | None = None
 
 
-@app.get("/")
+#@app.get("/")
 def root():
     return {
         "message": "Oracle API is running",
@@ -119,3 +120,21 @@ def health_check():
             "status": "unhealthy",
             "error": str(e)
         }
+
+# Serve built frontend (dist folder from root)
+DIST_DIR = Path("/app/dist")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    # If it's an actual file in dist (e.g., assets, favicon), serve it
+    file_path = (DIST_DIR / full_path).resolve()
+    if file_path.is_file() and str(file_path).startswith(str(DIST_DIR)):
+        return FileResponse(file_path)
+    
+    # Otherwise (SPA routing), serve index.html
+    index_path = DIST_DIR / "index.html"
+    if index_path.is_file():
+        return FileResponse(index_path)
+    
+    # Fallback error if dist missing
+    return {"error": "Frontend not found"}
