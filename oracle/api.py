@@ -122,7 +122,7 @@ def health_check():
         }
 
 # Serve built frontend (dist folder from root)
-DIST_DIR = Path("/app/dist")
+DIST_DIR = Path(__file__).parent.parent / "frontend" / "dist"
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
