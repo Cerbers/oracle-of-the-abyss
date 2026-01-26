@@ -8,19 +8,20 @@ const UserInputBox = ({ onAnalysisReceived }) => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+    
         if (!writing.trim()) return;
 
         setIsLoading(true);
+    
         try {
-            const response = await axios.post('http://localhost:8000/analyze', { 
+        // Use environment variable
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const response = await axios.post(`${API_URL}/analyze`, { 
                 poem_text: writing,
                 title: title || "Untitled"
             });
-            
-            // Pass the entire analysis result to parent
+        
             onAnalysisReceived(response.data);
-            
             console.log('Analysis received:', response.data);
         } catch (error) {
             console.error('Error getting analysis:', error);
