@@ -13,6 +13,3 @@ cloc.exe
 cloc
 .claude/settings.local.json
 user poems/The Dominion of Lies.txt
-frontend/.env.production
-frontend/.env
-frontend/.env.local
