@@ -10,13 +10,14 @@ from oracle.intern.lookout import watch_running_time_of_function
 
 
 def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
-    """    Reads only .txt files' names from the specified folder and returns a 
+    """    Reads only .txt and .md files' names from the specified folder and returns a 
     list that contains names of those files."""
 
     poem_texts = []
     folder = Path(folder_path)
 
-    for file_path in folder.glob("*.txt"):
+    # Support both .txt and .md files
+    for file_path in list(folder.glob("*.txt")) + list(folder.glob("*.md")):
         if not file_path.name.endswith("_analysis.txt"):
             with open(file_path, 'r', encoding='utf-8') as file:
                 if file.read().strip() != "":
@@ -64,12 +65,21 @@ def write_poem_analysis(file_path: str) -> None:
 
 @watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
-    """Reads multiple poem files from 'user poems' folder and writes their analyses."""
+    """Reads multiple poem files from the specified folder and writes their analyses."""
+
+    folder = Path(folder_path)
+    if not folder.exists() or not folder.is_dir():
+        print(f"Error: The directory '{folder_path}' does not exist or is not a directory.")
+        return
 
     poem_file_names = read_poem_folder_and_return_names(folder_path)
 
+    if not poem_file_names:
+        print(f"No valid poems found in '{folder_path}'.")
+        return
+
     for poem_file_name in poem_file_names:
-        poem_file_path = Path(folder_path) / poem_file_name
+        poem_file_path = folder / poem_file_name
         write_poem_analysis(str(poem_file_path))
 
 
@@ -79,7 +89,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Oracle of the Abyss - Poem Analyzer")
     parser.add_argument("--perf", action="store_true", help="Enable performance monitoring")
-    parser.add_argument("--folder", type=str, default="user poems", help="Folder containing poems")
+    parser.add_argument("--folder", type=str, default="user poems", help="Folder containing poems (relative or absolute path)")
     args = parser.parse_args()
 
     if args.perf:
