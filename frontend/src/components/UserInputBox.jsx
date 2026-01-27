@@ -2,8 +2,22 @@ import { useState } from 'react';
 import axios from 'axios';
 
 const UserInputBox = ({ onAnalysisReceived }) => {
-    const [writing, setWriting] = useState('');
-    const [title, setTitle] = useState('');
+    const examplePoem = `Blue hues of night cover the sight
+of bewitched stars above
+    
+Yet no respite from the blight
+that is the luminous light
+    
+Sun and moon- they are the same
+One is mirror, the other is flame
+    
+I just don't know
+which is which
+For my sight is lost
+to the plight of light
+`
+    const [writing, setWriting] = useState(examplePoem);
+    const [title, setTitle] = useState('Test');
     const [isLoading, setIsLoading] = useState(false);
     
     const handleSubmit = async (e) => {
