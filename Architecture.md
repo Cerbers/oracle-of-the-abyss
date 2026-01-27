@@ -11,7 +11,7 @@ It serves three main purposes:
 - to make future refactoring or feature additions easier by providing context
 - to serve as a self-reflection and portfolio artifact showing architectural thinking
 
-Last updated: January 2026
+Last updated: January 2026 (web architecture expansion)
 
 ## 2. Initial Design and Constraints
 
@@ -21,7 +21,7 @@ Last updated: January 2026
 - Strong preference for planning on paper first, then coding
 - Constraints:
   - Use only standard library + Poetry + pytest + NLTK (CMUdict)
-  - Keep it CLI-based, no web/UI
+  - ~~Keep it CLI-based, no web/UI~~ → Extended to web (FastAPI + React) while preserving CLI capability
   - Maximize learning: try dataclasses, cached properties, TDD-ish approach, good test coverage
 
 ## 3. Evolution of the Architecture
@@ -62,22 +62,71 @@ Last updated: January 2026
 - Easier to test in isolation
 - Clearer mental model when adding features
 
+### 3.3 Expansion to Web Architecture (FastAPI + React)
+
+**Before January 2026:**
+- CLI-only tool — sufficient for personal use but limited shareability
+- No way for others to try the tool without Python/NLTK setup
+
+**Trigger for change:**
+- Wanted to learn FastAPI and React+Vite as practical portfolio skills
+- Realized a web interface would make the tool accessible to non-technical users
+- Curious about what backend design decisions matter when building for a frontend consumer
+
+**Change:**
+- Added FastAPI layer (`api.py`) exposing analysis as REST endpoints
+- Built React+Vite frontend with Tailwind for styling
+- Backend serves built frontend as static files (single deployment)
+
+**Key learnings about backend-frontend interface:**
+- API responses need to be structured for frontend consumption (consistent shapes, clear error handling)
+- CORS configuration matters immediately in development
+- Pydantic models serve double duty: validation + API documentation
+- Health endpoint valuable for deployment monitoring
+- Good Modular Backend with Separation of Concerns needs very little to no changes to connect with API and frontend
+
+**Outcome:**
+- Core domain logic unchanged — API is a thin layer over existing analyzer
+- Frontend can evolve independently of backend
+- Same analysis code powers CLI and web
+
 ## 4. Current Architectural Overview
 
-poems/*.txt 
+### CLI Flow (original)
+```
+poems/*.txt
   → read_poem_folder_and_return_names()
-  → write_poem_analysis() 
+  → write_poem_analysis()
   → Poem(text, filepath)
   → parse_into_stanzas() → list[Stanza]
   → analyze_poem() → metrics dict
   → write analysis.txt
+```
 
+### Web Flow (new)
+```
+React Frontend (Vite + Tailwind)
+  → axios POST /analyze
+  → FastAPI (api.py)
+  → Poem + analyze_poem()
+  → JSON response
+  → render in browser
+```
 
+### Deployment
+```
+Docker multi-stage build:
+  Stage 1: Node 20 → build React frontend → /dist
+  Stage 2: Python 3.12-slim → FastAPI + /dist → single container
+  → Render (or any container platform)
+```
 
 Core layers:
 - **Domain layer** — `Poem`, `Stanza`, `Line`, `Word` (dataclasses)
-- **Infrastructure layer** — file reading/writing, CLI batch processing
-- **Analysis layer** — syllable counting, future: meter/rhyme detection
+- **Analysis layer** — syllable counting (future: meter/rhyme detection)
+- **API layer** — FastAPI endpoints, Pydantic request/response models
+- **Frontend layer** — React components, Tailwind styling
+- **Infrastructure layer** — file I/O (CLI), static file serving (web), Docker packaging
 
 ## 5. Key Architectural Decisions
 
@@ -133,29 +182,115 @@ Core layers:
 - **Rationale**  
   Callers get clean, single-purpose methods without union types. The complexity of the union return lives in one internal method instead of spreading through the codebase.
 
-- **Consequences**  
+- **Consequences**
   Public API is simpler and more type-safe. Internal implementation can change without affecting callers. Slightly more methods, but each has clear intent.
+
+### ADR-004: Adding FastAPI as Web Backend
+
+- **Context**
+  Wanted to expose the analyzer as a web service for accessibility and to learn backend web development
+
+- **Decision**
+  Use FastAPI with Pydantic models for request/response validation
+
+- **Rationale**
+  - FastAPI is modern, well-documented, and good for learning
+  - Have used it before and recalled it being slim and relatively easy to use
+  - Automatic OpenAPI docs (`/docs`) for free
+  - Pydantic integrates naturally with existing dataclass-based domain
+  - Async support available if needed later
+
+- **Consequences**
+  - Positive: clean API with validation, auto-generated docs, easy deployment
+  - Positive: forced clearer thinking about what data frontend actually needs
+  - Negative: additional dependencies (fastapi, uvicorn, pydantic)
+  - API layer is intentionally thin — no business logic lives there
+
+### ADR-005: Adding React + Vite Frontend
+
+- **Context**
+  Wanted a modern frontend to make the tool accessible and to learn React since learning through course was not enough to retain knowledge
+
+- **Decision**
+  React 19 + Vite + Tailwind CSS, served as static files from FastAPI
+
+- **Rationale**
+  - React is industry-standard, good investment for learning
+  - Vite provides fast dev experience with HMR
+  - Tailwind allows rapid styling without CSS complexity
+  - Single deployment: FastAPI serves built frontend from `/dist`
+
+- **Consequences**
+  - Positive: interactive UI, accessible to non-technical users
+  - Positive: frontend and backend can be developed/tested independently
+  - Negative: JavaScript toolchain complexity (node_modules, build step)
+  - Acceptable: frontend is intentionally simple — no routing, no state management library
+
+### ADR-006: Docker for Deployment
+
+- **Context**
+  Needed to deploy combined frontend + backend to Render hosting
+
+- **Decision**
+  Use Docker with multi-stage build instead of platform-native buildpacks
+
+- **Rationale**
+  - Multi-stage build cleanly handles both Node (frontend build) and Python (backend) in one image
+  - Reproducible builds — same environment locally and in production
+  - Portable across container platforms (Render, Railway, Fly.io, etc.)
+  - Explicit control over dependencies and build steps
+
+- **Consequences**
+  - Positive: single deployable artifact containing everything
+  - Positive: not locked into any specific hosting platform's build system
+  - Negative: need to maintain Dockerfile, slightly more setup than platform defaults
+  - Acceptable: Dockerfile is straightforward and well-documented
 
 ## 6. Testing and Validation Strategy
 
+**Backend (Python):**
 - pytest + comprehensive assertions on structure, content, edge cases
 - Focus: unit tests for domain objects & syllable counter, integration for parsing & full analysis flow
 - Goal: >85% coverage on core logic
 - No mocking of external libs (NLTK) — accept it as trusted dependency
 - tmp_path fixture for all file I/O tests
 
+**API:**
+- FastAPI's `/health` endpoint for runtime verification
+- Manual testing via `/docs` (Swagger UI) during development
+- API tests not yet implemented — future consideration
+
+**Frontend:**
+- No automated tests yet — acceptable for current scope
+- Manual browser testing during development
+
 
 ## 7. Tradeoffs and Known Limitations
 
+**Core analysis:**
 - English-only (CMUdict) — intentional scope limitation
 - No support for multiple pronunciation selection yet (uses first variant)
 - No rhyme/stress pattern detection (planned)
 - Performance not optimized (irrelevant for <1000 poems)
-- No CLI arguments yet (folder hardcoded with default)
 - NLTK download required — documented in README
+
+**Web architecture:**
+- Single deployment model (API serves frontend) — simple but limits independent scaling
+- No authentication — intentional for public demo tool
+- No API versioning — will address if breaking changes needed
+- Frontend has no tests yet — acceptable for current scope
+- No CLI arguments yet (folder hardcoded with default) — lower priority now that web exists
 
 ## 8. Future Considerations
 
-- Add CLI arguments (`argparse` or `typer`): folder, output format (txt/json), options (variants on/off)
+**Analysis features:**
 - Support multiple pronunciation variants + best-fit meter detection
 - Rhyme scheme detection (end-word phoneme comparison)
+
+**Web/infrastructure:**
+- Add frontend tests (React Testing Library or Playwright)
+- API tests with pytest + httpx
+- Consider API versioning if public usage grows
+
+**Lower priority (now that web exists):**
+- CLI arguments (`argparse` or `typer`): folder, output format, options
