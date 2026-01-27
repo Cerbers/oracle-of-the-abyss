@@ -39,13 +39,6 @@ class PoemAnalysisResult(BaseModel):
     error: str | None = None
 
 
-#@app.get("/")
-def root():
-    return {
-        "message": "Oracle API is running",
-        "version": "0.1.0",
-        "endpoints": ["/analyze", "/docs"]
-    }
 
 @app.post("/analyze")
 def analyze_endpoint(request: PoemRequest):
