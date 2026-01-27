@@ -40,7 +40,7 @@ def count_syllables(word: str) -> list[int]:
             # it is a real elision -> fallback and subtract 1
             return [fallback_estimate(word_lower) - 1]
     
-    word_stripped = word_lower.strip(".,;:!?\"'()[]{}")
+    word_stripped = word_lower.strip(".,;:!?\"'()[]{}#*-—")
 
     if word_stripped in DICTIONARY_CMUDICT:
         return count_phonetically(word_stripped)
