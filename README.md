@@ -86,13 +86,23 @@ This serves both the API and frontend at `http://localhost:8000`.
 
 ### CLI Usage
 
-Place your poem files (`.txt` format) in the `user poems` folder and run:
-
+Place your poem files (`.txt` or `.md` format) in the `user poems` folder and run:
 ```bash
 poetry run python -m oracle.main
 ```
 
 This will generate analysis files for each poem with the suffix `_analysis.txt`.
+
+Additionally you can specify a folder to read poems from:
+```bash
+poetry run python -m oracle.main --folder "insert absolute or relative path"
+```
+
+**Performance monitoring:**
+```bash
+poetry run python -m oracle.main --perf
+```
+
 
 ### Programmatic Usage
 
@@ -332,7 +342,7 @@ I'm aware of these limitations and will address them as the project continues.
 
 - [ ] Support for multiple pronunciation variants per word
 - [ ] Pattern detection across stanzas (rhyme schemes, meter)
-- [ ] CLI with arguments for custom folders and output formats
+- [partially ] CLI with arguments for custom folders and output formats
 - [ ] Improved error handling and user feedback
 - [ ] Performance optimization for large poem collections
 

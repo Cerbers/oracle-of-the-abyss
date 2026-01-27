@@ -5,7 +5,6 @@ from oracle.intern.lookout import watch_running_time_of_function
 
 # TODO improve read_poem_file_and_return_content with error handling
 # TODO improve write_poem_analysis to format analysis nicely
-# TODO: Add user input via CLI
 
 
 
