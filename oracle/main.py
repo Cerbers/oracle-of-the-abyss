@@ -62,7 +62,7 @@ def write_poem_analysis(file_path: str) -> None:
             file.write(f"Syllables per line: {syllables}\n\n")
 
 
-# @watch_running_time_of_function
+@watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
     """Reads multiple poem files from 'user poems' folder and writes their analyses."""
 
@@ -74,4 +74,15 @@ def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems")
 
 
 if __name__ == "__main__":
-    read_multiple_poem_files_and_write_analyses()
+    import argparse
+    import os
+    
+    parser = argparse.ArgumentParser(description="Oracle of the Abyss - Poem Analyzer")
+    parser.add_argument("--perf", action="store_true", help="Enable performance monitoring")
+    parser.add_argument("--folder", type=str, default="user poems", help="Folder containing poems")
+    args = parser.parse_args()
+
+    if args.perf:
+        os.environ["ORACLE_LOOKOUT"] = "1"
+
+    read_multiple_poem_files_and_write_analyses(folder_path=args.folder)
