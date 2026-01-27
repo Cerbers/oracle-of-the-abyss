@@ -1,6 +1,6 @@
-# Oracle
+# Oracle of the Abyss
 
-A Python poetry analysis tool that counts syllables and identifies potential metrical patterns in poems.
+A full-stack poetry analysis application that counts syllables and identifies structural patterns in poems. Features a FastAPI backend and React frontend.
 
 ## Overview
 
@@ -16,15 +16,18 @@ Built with modular architecture that separates parsing, analysis, and data model
 - **Stanza structure analysis** with line and syllable counts per stanza
 - **Batch processing** for multiple poem files
 - **Fallback estimation** for words not in the CMU dictionary
+- **REST API** for programmatic access
+- **Web interface** for interactive poem analysis
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.13.5 or higher
+- Python 3.13 or higher
 - Poetry (for dependency management)
+- Node.js 20+ (for frontend development)
 
-### Setup
+### Backend Setup
 
 1. Clone the repository:
 ```bash
@@ -32,7 +35,7 @@ git clone https://github.com/Cerbers/oracle-of-the-abyss.git
 cd oracle-of-the-abyss
 ```
 
-2. Install dependencies:
+2. Install Python dependencies:
 ```bash
 poetry install
 ```
@@ -42,9 +45,46 @@ poetry install
 python -m nltk.downloader cmudict
 ```
 
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+```
+
 ## Usage
 
-### Basic Usage
+### Running as a Server
+
+Start the FastAPI backend server:
+
+```bash
+uvicorn oracle.api:app --reload
+```
+
+The API will be available at `http://localhost:8000`.
+
+To run with the frontend in development mode, open a second terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
+
+### Running with Docker
+
+Build and run the complete application:
+
+```bash
+docker build -t oracle .
+docker run -p 8000:8000 oracle
+```
+
+This serves both the API and frontend at `http://localhost:8000`.
+
+### CLI Usage
 
 Place your poem files (`.txt` format) in the `user poems` folder and run:
 
@@ -104,17 +144,127 @@ Lines: 1
 Syllables per line: [13]
 ```
 
+## API
+
+The REST API provides programmatic access to poem analysis.
+
+### Endpoints
+
+#### `POST /analyze`
+
+Analyze a single poem.
+
+**Request:**
+```json
+{
+  "poem_text": "Born out of the void\nAmidst the stars of flesh",
+  "title": "My Poem"
+}
+```
+
+**Response:**
+```json
+{
+  "stanza_texts": ["Born out of the void\nAmidst the stars of flesh"],
+  "line_counts": [2],
+  "syllables_per_line": [[5, 6]]
+}
+```
+
+#### `POST /batch-analyze`
+
+Analyze multiple poems in one request.
+
+**Request:**
+```json
+{
+  "poems": [
+    {"poem_text": "...", "title": "Poem 1"},
+    {"poem_text": "...", "title": "Poem 2"}
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "results": [
+    {"title": "Poem 1", "analysis": {...}, "error": null},
+    {"title": "Poem 2", "analysis": {...}, "error": null}
+  ],
+  "total": 2
+}
+```
+
+#### `GET /health`
+
+Health check for the API and its dependencies.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "syllable_counter": "operational",
+  "cmu_dict": "loaded"
+}
+```
+
+## Frontend
+
+The web interface provides an interactive way to analyze poems.
+
+### Features
+
+- **Poem input form** with title and text fields
+- **Real-time analysis** via API integration
+- **Formatted output** displaying stanza structure and syllable counts
+- **Responsive design** using Tailwind CSS
+
+### Technology Stack
+
+- React 19
+- Vite (build tool)
+- Tailwind CSS (styling)
+- Axios (HTTP client)
+
+### Environment Configuration
+
+The frontend uses environment variables for API configuration:
+
+- `.env` (development): `VITE_API_URL=http://localhost:8000`
+- `.env.production` (production): `VITE_API_URL=https://oracle-of-the-abyss.onrender.com`
+
 ## Project Structure
 
 ```
-oracle/  
-├── domain_objects.py    # Core domain models (Word, Line, Stanza)
-├── parser.py            # Text parsing into domain objects
-├── syllable_counter.py  # Syllable counting logic
-├── poem_model.py        # Poem dataclass with cached properties
-├── analyzer.py          # Main analysis orchestration
-├── utils.py             # Helper functions
-└── main.py              # CLI entry point
+oracle-of-the-abyss/
+├── oracle/                      # Python backend
+│   ├── api.py                   # FastAPI application & REST endpoints
+│   ├── analyzer.py              # Main analysis orchestration
+│   ├── poem_model.py            # Poem dataclass with cached properties
+│   ├── parser.py                # Text parsing into domain objects
+│   ├── domain_objects.py        # Core domain models (Word, Line, Stanza)
+│   ├── syllable_counter.py      # Syllable counting logic
+│   ├── syllable_pattern.py      # Pattern detection (placeholder)
+│   ├── utils.py                 # Helper functions
+│   ├── main.py                  # CLI entry point
+│   └── intern/
+│       └── lookout.py           # Performance monitoring
+├── frontend/                    # React frontend
+│   ├── src/
+│   │   ├── App.jsx              # Main app component
+│   │   ├── main.jsx             # React entry point
+│   │   └── components/
+│   │       ├── UserInputBox.jsx      # Poem input form
+│   │       └── AnalysisOutputBox.jsx # Results display
+│   ├── vite.config.js           # Vite configuration
+│   └── package.json             # Node dependencies
+├── tests/                       # Test suite
+├── docs/                        # Documentation
+├── user poems/                  # Sample poem files
+├── Dockerfile                   # Multi-stage Docker build
+├── render.yaml                  # Render deployment config
+└── pyproject.toml               # Python project metadata
 ```
 
 ## Development
@@ -130,9 +280,9 @@ poetry run pytest
 This project emphasizes correctness, clarity, and incremental design.
 Testing is used as a safety net and as executable documentation of expected behavior, rather than strict test-first development in all areas.
 
-- Tests are added when behavior becomes clear and stable  
-- Exploratory implementation may precede tests for heuristic or algorithmic components  
-- Architecture favors modular design and explicit domain objects over quick fixes  
+- Tests are added when behavior becomes clear and stable
+- Exploratory implementation may precede tests for heuristic or algorithmic components
+- Architecture favors modular design and explicit domain objects over quick fixes
 - Inheritance is kept shallow (maximum one level) in favor of composition
 
 ## Technical Details
@@ -149,10 +299,32 @@ Testing is used as a safety net and as executable documentation of expected beha
 
 Words with multiple pronunciations in the CMU dictionary currently use the first (most common) variant. Future versions will explore all pronunciation combinations to identify consistent metrical patterns.
 
+## Deployment
+
+The application is deployed on [Render](https://oracle-of-the-abyss.onrender.com).
+
+### Deployment Configuration
+
+The `render.yaml` file configures automatic deployment:
+
+```yaml
+services:
+  - type: web
+    name: oracle-api
+    runtime: docker
+    envVars:
+      - key: PORT
+        value: 10000
+```
+
+The Dockerfile uses a multi-stage build:
+1. Stage 1 (Node.js): Builds the React frontend
+2. Stage 2 (Python): Runs FastAPI and serves the built frontend
+
 ## Known Limitations
 
 - **Whitespace handling:** Leading whitespace and indentation in poem files are stripped during parsing. This affects visual formatting in the analysis output but does not impact syllable counting.
-- **Pronunciation variants:** The syllable counter currently uses the first pronunciation variant from the CMU dictionary, which may not always reflect the intended pronunciation in context. For example, "our" could be 2 syllables or 1 syllable
+- **Pronunciation variants:** The syllable counter currently uses the first pronunciation variant from the CMU dictionary, which may not always reflect the intended pronunciation in context. For example, "our" could be 2 syllables or 1 syllable.
 
 I'm aware of these limitations and will address them as the project continues.
 
