@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from functools import cached_property
 from oracle.syllable_counter import count_syllables
-from typing import cast, List
+from typing import cast
 
 
 @dataclass
@@ -25,12 +25,12 @@ class Line:
     def get_total_syllables(self) -> int:
         """Calculate total syllables for the line (sum of first variants)."""
         counts = self.get_syllable_counts(use_all_variants=False)
-        return sum(cast(List[int], counts))
+        return sum(cast(list[int], counts))
     
         # To be used by syllable matching pattern
     def get_all_syllable_variants(self) -> list[list[int]]:
         """Get all unique syllable variants per word for pattern analysis."""
-        return cast(List[List[int]], self.get_syllable_counts(use_all_variants=True))
+        return cast(list[list[int]], self.get_syllable_counts(use_all_variants=True))
 
     def get_syllable_counts(self, use_all_variants: bool = False) -> list[int] | list[list[int]]:
         """

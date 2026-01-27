@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
-from typing import List
 from oracle.analyzer import analyze_poem
 from oracle.poem_model import Poem
 
@@ -31,7 +30,7 @@ class PoemRequest(BaseModel):
     title: str = "Untitled"
 
 class BatchPoemRequest(BaseModel):
-    poems: List[PoemRequest]
+    poems: list[PoemRequest]
 
 class PoemAnalysisResult(BaseModel):
     title: str
