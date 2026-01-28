@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from oracle.syllable_counter import count_syllables
 from typing import cast
-
+from oracle.syllable_counter import LETTERS
 
 @dataclass
 class Word:
@@ -53,7 +53,17 @@ class Line:
     @property
     def line_chain_of_words(self) -> list[Word]:
         words_in_line = self.text.split()
-        return [Word(text=word) for word in words_in_line]
+        result = []
+    
+        for word in words_in_line:
+            if "-" in word:
+                # Split compound words on dashes
+                parts = word.split("-")
+                result.extend([Word(text=part) for part in parts])
+            else:
+                result.append(Word(text=word))
+    
+        return result
 
     @staticmethod
     def _get_unique_variants(variants: list[int]) -> list[int]:

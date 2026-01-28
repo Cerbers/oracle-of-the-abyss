@@ -66,13 +66,19 @@ def test_stanza_is_not_empty():
         Stanza(lines=None)
 
 def test_line_get_syllable_counts_returns_per_word_counts():
-    """Test that the line count function returns the correct number of lines in a poem."""
+    """Test that the line count function returns the correct number of syllable in each word in a line."""
     
-    case_line = Line(text="Born out of the void")
-    test_count = case_line.get_syllable_counts()
+    case_line_1 = Line(text="Born out of the void")
+    test_count_1 = case_line_1.get_syllable_counts()
+
+    case_line_2 = Line(text="Who lies in blood-flow of the night")
+    test_count_2 = case_line_2.get_syllable_counts()
     
-    expected_syllable_counts = [1, 1, 1, 1, 1]
-    assert test_count == expected_syllable_counts, "Line syllable variants do not match expected values."
+    expected_syllable_counts_1 = [1, 1, 1, 1, 1]
+    assert test_count_1 == expected_syllable_counts_1, "Line syllable variants do not match expected values."
+
+    expected_syllable_counts_2 = [1, 1, 1, 1, 1, 1, 1, 1]
+    assert test_count_2 == expected_syllable_counts_2, "Line syllable variants do not match expected values."
 
 def test_stanza_has_text_representation_by_merging_lines():
     """Test that Stanza can merge its lines into a single text representation."""

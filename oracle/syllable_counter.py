@@ -11,6 +11,9 @@ except LookupError:
 # TODO increase accuracy of count_syllables by adding more rules
 # TODO: make count_syllables return list[int] of all variants instead of just one int once syllable_pattern is fully functional
 VOWELS = "aeiouy"
+CONSONANTS = "bcdfghjklmnpqrstvwxyz"
+LETTERS = VOWELS + CONSONANTS
+
 
 def count_phonetically(word: str) -> list[int]:
     """"Count syllables in a word using CMU Pronouncing Dictionary."""
@@ -40,7 +43,7 @@ def count_syllables(word: str) -> list[int]:
             # it is a real elision -> fallback and subtract 1
             return [fallback_estimate(word_lower) - 1]
     
-    word_stripped = word_lower.strip(".,;:!?\"'()[]{}#*-—")
+    word_stripped = word_lower.strip(".,;:!?\"'()[]{}#*_")
 
     if word_stripped in DICTIONARY_CMUDICT:
         return count_phonetically(word_stripped)

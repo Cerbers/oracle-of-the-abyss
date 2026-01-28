@@ -18,7 +18,6 @@ def analyze_poem(poem: Poem) -> dict[str, list[str] | list[int] | list[list[int]
 
         stanza_syllables = [line.get_total_syllables() for line in stanza_obj.lines]
         syllables_per_line.append(stanza_syllables)
-    
     return {
         'stanza_texts': stanza_texts,
         'line_counts': line_counts,
