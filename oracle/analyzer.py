@@ -1,11 +1,31 @@
+
+"""
+Analyzer module for poem analysis.
+"""
+
 from oracle.poem_model import Poem
 from oracle.intern.lookout import watch_running_time_of_function
 
 
 
-# @watch_running_time_of_function
+@watch_running_time_of_function
 def analyze_poem(poem: Poem) -> dict[str, list[str] | list[int] | list[list[int]]]:
-    """Analyze poem using domain objects for flexible syllable pattern detection."""
+    """
+    Analyze poem using domain objects for flexible syllable pattern detection.
+    
+    Args:
+        poem (Poem): The poem to analyze.
+    
+    Returns:
+        dict[str, list[str] | list[int] | list[list[int]]]: A dictionary containing:
+            - stanza_texts: List of stanza text strings
+            - line_counts: List of line counts per stanza
+            - syllables_per_line: List of syllable counts per line
+    
+    Note:
+        This function uses domain objects (Stanza, Line) for flexible syllable pattern detection.
+        It processes the poem through the Stanza objects which contain the processed line data.
+    """
     
     stanza_texts = []
     line_counts = []

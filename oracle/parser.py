@@ -1,14 +1,28 @@
+"""
+Parser module for turning poem text into domain objects.
+"""
+
 from oracle.domain_objects import Line, Stanza
 from oracle.utils import check_for_title_line
 
 # TODO improve parse_into_stanzas to handle title cases when first line of other stanzas matches filename
 
 def parse_into_stanzas(poem_text: str, poem_name: str) -> list[Stanza]:
-    """Parse poem text into stanzas, separated by blank line/s.
+    """
+    Parse poem text into stanzas, separated by blank line/s.
      
-     Function strips leading/trailing whitespace from lines,
-     and handles multiple consecutive blank lines as a single stanza separator.
-     Function returns a list of stanzas, where each stanza is a list of its lines."""
+    Args:
+        poem_text (str): The raw poem text to parse.
+        poem_name (str): The name of the poem, used to identify title lines.
+
+    Returns:
+        list[Stanza]: A list of Stanza objects, each containing Line objects.
+
+    Note:
+        The function strips leading/trailing whitespace from lines,
+        and handles multiple consecutive blank lines as a single stanza separator.
+        The function returns a list of stanzas, where each stanza is a list of its lines.
+    """
 
     cleaned_text = '\n'.join(line.strip() for line in poem_text.splitlines())
     stanzas=cleaned_text.split('\n\n')

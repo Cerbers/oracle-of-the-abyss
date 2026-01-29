@@ -255,7 +255,6 @@ oracle-of-the-abyss/
 │   ├── parser.py                # Text parsing into domain objects
 │   ├── domain_objects.py        # Core domain models (Word, Line, Stanza)
 │   ├── syllable_counter.py      # Syllable counting logic
-│   ├── syllable_pattern.py      # Pattern detection (placeholder)
 │   ├── utils.py                 # Helper functions
 │   ├── main.py                  # CLI entry point
 │   └── intern/
@@ -342,7 +341,7 @@ I'm aware of these limitations and will address them as the project continues.
 
 - [ ] Support for multiple pronunciation variants per word
 - [ ] Pattern detection across stanzas (rhyme schemes, meter)
-- [partially ] CLI with arguments for custom folders and output formats
+- [ partially ] CLI with arguments for custom folders and output formats
 - [ ] Improved error handling and user feedback
 - [ ] Performance optimization for large poem collections
 

@@ -1,3 +1,7 @@
+"""
+Performance monitoring utilities for the Oracle of the Abyss.
+"""
+
 import time 
 import os
 from functools import wraps
@@ -7,6 +11,15 @@ Parameters = ParamSpec('Parameters')
 Result = TypeVar('Result')
 
 def watch_running_time_of_function(func: Callable[Parameters, Result]) -> Callable[Parameters, Result]:
+    """
+    Decorator to measure and print the execution time of a function.
+    
+    Args:
+        func: The function to wrap.
+    
+    Returns:
+        A wrapped function that prints its execution time.
+    """
     @wraps(func)
     def wrapper(*args: Parameters.args, **kwargs: Parameters.kwargs) -> Result:
         if os.getenv("ORACLE_LOOKOUT") == "1":

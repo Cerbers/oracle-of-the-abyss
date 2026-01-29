@@ -1,3 +1,7 @@
+"""
+API module for the Oracle Poetry Analyzer.
+"""
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -26,13 +30,34 @@ app.add_middleware(
 
 
 class PoemRequest(BaseModel):
+    """
+    Request model for poem analysis.
+    
+    Attributes:
+        poem_text: The text of the poem to analyze.
+        title: The title of the poem.
+    """
     poem_text: str
     title: str = "Untitled"
 
 class BatchPoemRequest(BaseModel):
+    """
+    Request model for batch poem analysis.
+    
+    Attributes:
+        poems: List of poems to analyze.
+    """
     poems: list[PoemRequest]
 
 class PoemAnalysisResult(BaseModel):
+    """
+    Result model for poem analysis.
+    
+    Attributes:
+        title: The title of the poem.
+        analysis: The analysis of the poem.
+        error: Error message if analysis failed.
+    """
     title: str
     analysis: dict
     error: str | None = None
@@ -67,8 +92,13 @@ def batch_analyze_endpoint(request: BatchPoemRequest):
     """
     Analyze multiple poems in a single request.
 
-    Returns a list of results, one for each poem.
-    If a poem fails to analyze, ist error field will contain the error message.
+    Args:
+        request (BatchPoemRequest): The request containing the poems to analyze.
+
+    Returns:
+        dict: A dictionary containing:
+            - results: List of results, one for each poem
+            - total: Total number of poems analyzed
     """
     results = []
 
@@ -113,13 +143,25 @@ def health_check():
             "error": str(e)
         }
 
+
 # Serve built frontend (dist folder from root)
-DIST_DIR = Path(__file__).parent.parent / "dist"
+# Underscore to stop pdoc from documenting this variable since it's absolute path
+_DIST_DIR = Path(__file__).parent.parent / "dist" 
+
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
-    dist_resolved = DIST_DIR.resolve()
-    file_path = (DIST_DIR / full_path).resolve()
+    """
+    Serve the built frontend from the dist directory.
+    
+    Args:
+        full_path (str): The path to the file to serve.
+    
+    Returns:
+        FileResponse: The file to serve.
+    """
+    dist_resolved = _DIST_DIR.resolve()
+    file_path = (_DIST_DIR / full_path).resolve()
     
     # Security check: ensure we're not serving files outside dist
     if file_path.is_file() and str(file_path).startswith(str(dist_resolved)):

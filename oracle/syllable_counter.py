@@ -1,3 +1,7 @@
+"""
+Syllable counting module for the Oracle Poetry Analyzer.
+"""
+
 import nltk # type: ignore[import-untyped]
 from nltk.corpus import cmudict # type: ignore[import-untyped]
 
@@ -9,14 +13,22 @@ except LookupError:
     DICTIONARY_CMUDICT = cmudict.dict()
 
 # TODO increase accuracy of count_syllables by adding more rules
-# TODO: make count_syllables return list[int] of all variants instead of just one int once syllable_pattern is fully functional
 VOWELS = "aeiouy"
 CONSONANTS = "bcdfghjklmnpqrstvwxyz"
 LETTERS = VOWELS + CONSONANTS
 
 
 def count_phonetically(word: str) -> list[int]:
-    """"Count syllables in a word using CMU Pronouncing Dictionary."""
+    """
+    Count syllables in a word using CMU Pronouncing Dictionary.
+    
+    Args:
+        word: The word to count syllables for.
+    
+    Returns:
+        A list of possible syllable counts for the word object.
+    """
+
     syllable_counts = []
     for pronunciation in DICTIONARY_CMUDICT[word]:
         syllable_count = len([phoneme for phoneme in pronunciation if phoneme[-1].isdigit()])
@@ -25,9 +37,18 @@ def count_phonetically(word: str) -> list[int]:
     return syllable_counts
 
 def count_syllables(word: str) -> list[int]:
-    """Count syllables in a word using CMU Pronouncing Dictionary, 
-    lowercase fallback, elision handling, and stripping punctuation.
-    If all else fails, use a simple vowel counting method."""
+    """
+    Count syllables in a word using CMU dictionary and fallback methods.
+
+    Args:
+        word: The word to count syllables for.
+
+    Returns:
+        A list of possible syllable counts for the word object.
+
+    Note:
+        Returns a list because some words have multiple pronunciations.
+    """
 
     if word in DICTIONARY_CMUDICT:
         return count_phonetically(word)
@@ -51,7 +72,15 @@ def count_syllables(word: str) -> list[int]:
         return [fallback_estimate(word_stripped)]
 
 def fallback_estimate(word: str) -> int:
-    """A simple syllable counting function based on vowel groups."""
+    """
+    A simple syllable counting function based on vowel groups.
+    
+    Args:
+        word: The word to count syllables for.
+    
+    Returns:
+        The estimated number of syllables in the word.
+    """
 
     count = 0
     in_vowel = False

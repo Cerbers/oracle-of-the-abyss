@@ -1,3 +1,8 @@
+"""
+Module for domain objects used in poem analysis.
+"""
+
+
 from dataclasses import dataclass
 from functools import cached_property
 from oracle.syllable_counter import count_syllables
@@ -6,15 +11,49 @@ from oracle.syllable_counter import LETTERS
 
 @dataclass
 class Word:
+    """
+    Represents a word in a poem line.
+    
+    Attributes:
+        text (str): The text of the word.
+
+    Methods:
+        syllable_variants: Returns a list of possible syllable counts for the word.
+
+    Note:
+        The syllable_variants property returns a list of possible syllable counts
+        for the word, based on the syllable_counter module.
+    """
+
     text: str
 
     @property
     def syllable_variants(self) -> list[int]:
+        """Returns a list of possible syllable counts for the word."""
         return count_syllables(self.text)
 
 
 @dataclass
 class Line:
+    """
+    Represents a line in a poem.
+    
+    Attributes:
+        text (str): The text of the line.
+
+    Methods:
+        get_total_syllables: Returns the total number of syllables in the line.
+        get_all_syllable_variants: Returns all unique syllable variants per word for pattern analysis.
+        get_syllable_counts: Returns syllable counts for words in the line.
+
+    Note:
+        The get_total_syllables method calculates the total syllables for the line 
+        by summing the first variant of each word's syllable count.
+        The get_all_syllable_variants method returns all unique syllable variants per word 
+        for pattern analysis.
+        The get_syllable_counts method returns syllable counts for words in the line.
+    """
+
     text: str
 
     def __post_init__(self) -> None:
@@ -44,6 +83,7 @@ class Line:
             When False: [1, 2, 1] (first variant per word)
             When True: [[1], [2,1], [1]] (unique variants per word)
         """
+
         if use_all_variants:
             return [self._get_unique_variants(word.syllable_variants)
                     for word in self.line_chain_of_words]
@@ -52,6 +92,7 @@ class Line:
         
     @property
     def line_chain_of_words(self) -> list[Word]:
+        """Split line text into words, handling compound words with dashes."""
         words_in_line = self.text.split()
         result = []
     
@@ -79,6 +120,20 @@ class Line:
 
 @dataclass
 class Stanza:
+    """
+    Represents a stanza in a poem.
+    
+    Attributes:
+        lines (list[Line]): A list of Line objects that make up the stanza.
+    
+    Methods:
+        stanza_text_string: Returns the concatenated text of all lines in the stanza.
+    
+    Note:
+        The stanza_text_string property is used to maintain the original text of the stanza.
+        While the lines attribute contains the processed Line objects.
+    """
+
     lines: list[Line]
 
     def __post_init__(self) -> None:
@@ -87,4 +142,5 @@ class Stanza:
     
     @property
     def stanza_text_string(self) -> str:
+        """Return the concatenated text of all lines in the stanza."""
         return '\n'.join(line.text for line in self.lines)

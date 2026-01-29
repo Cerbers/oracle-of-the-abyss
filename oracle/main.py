@@ -1,3 +1,7 @@
+"""
+Main module for the Oracle Poetry Analyzer.
+"""
+
 from oracle.analyzer import analyze_poem
 from pathlib import Path
 from oracle.poem_model import Poem
@@ -9,8 +13,16 @@ from oracle.intern.lookout import watch_running_time_of_function
 
 
 def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
-    """    Reads only .txt and .md files' names from the specified folder and returns a 
-    list that contains names of those files."""
+    """
+    Reads only .txt and .md files' names from the specified folder and returns a 
+    list that contains names of those files.
+    
+    Args:
+        folder_path: The path to the folder containing poem files.
+    
+    Returns:
+        A list of poem file names.
+    """
 
     poem_texts = []
     folder = Path(folder_path)
@@ -26,7 +38,18 @@ def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
 
 
 def read_poem_file_and_return_content(file_path: str) -> str:
-    """Reads a poem from a text file and returns its content."""
+    """
+    Reads a poem from a text file and returns its content.
+    
+    Args:
+        file_path: The path to the poem file.
+    
+    Returns:
+        The content of the poem file, or empty string if file not found.
+    
+    Note:
+        Uses UTF-8 encoding and handles FileNotFoundError gracefully.
+    """
 
 
     try:
@@ -39,6 +62,16 @@ def read_poem_file_and_return_content(file_path: str) -> str:
         return ""
     
 def write_poem_analysis(file_path: str) -> None:
+    """
+    Analyzes a poem and writes the results to a text file.
+    
+    Args:
+        file_path: The path to the poem file to analyze.
+    
+    Note:
+        Creates an output file with '_analysis.txt' suffix containing
+        stanza breakdowns, line counts, and syllable counts.
+    """
     input_path = Path(file_path)
 
     poem_text = read_poem_file_and_return_content(file_path)
@@ -64,7 +97,16 @@ def write_poem_analysis(file_path: str) -> None:
 
 @watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
-    """Reads multiple poem files from the specified folder and writes their analyses."""
+    """
+    Processes all poem files in a folder and generates analysis files.
+    
+    Args:
+        folder_path: The path to the folder containing poem files.
+    
+    Note:
+        Skips files ending with '_analysis.txt' to avoid reprocessing.
+        Prints progress and error messages to console.
+    """
 
     folder = Path(folder_path)
     if not folder.exists() or not folder.is_dir():
