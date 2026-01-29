@@ -1,7 +1,198 @@
 
 # Architecture
 
-## 1. Purpose of This Document
+## Quick Reference
+
+Oracle is a full-stack poetry analysis application using a layered architecture that separates parsing, domain logic, and presentation layers.
+
+### System Flow
+```mermaid
+graph TB
+    subgraph Backend["Backend API"]
+        1a["1a: analyze_endpoint"]
+        5a["5a: batch_analyze_endpoint"]
+        1c["1c: analyze_poem call"]
+        1d["1d: stanza iteration"]
+        1e["1e: syllable calculation"]
+    end
+   
+    subgraph Parsing["Domain Parsing"]
+        2a["2a: Poem validation"]
+        2c["2c: parse_into_stanzas"]
+        2d["2d: stanza splitting"]
+        2e["2e: title detection"]
+        2f["2f: Line creation"]
+        2g["2g: Stanza creation"]
+    end
+   
+    subgraph SyllableLogic["Syllable Counting"]
+        3a["3a: get_total_syllables"]
+        3c["3c: word iteration"]
+        3d["3d: word splitting"]
+        3e["3e: Word creation"]
+        3f["3f: count_syllables call"]
+    end
+   
+    subgraph CMUDict["CMU Dictionary & Fallback"]
+        4a["4a: dictionary lookup"]
+        4b["4b: count_phonetically"]
+        4c["4c: phoneme counting"]
+        4e["4e: fallback estimation"]
+        4f["4f: vowel iteration"]
+    end
+   
+    subgraph Frontend["Frontend React"]
+        6a["6a: handleSubmit"]
+        6c["6c: API URL resolution"]
+        6d["6d: axios POST"]
+        6e["6e: result callback"]
+        7a["7a: AnalysisOutputBox"]
+        7b["7b: data destructuring"]
+        7c["7c: stanza iteration"]
+        7e["7e: syllables display"]
+    end
+   
+    subgraph Integration["Integration & Serving"]
+        8a["8a: CORS middleware"]
+        8b["8b: localhost:5173"]
+        8c["8c: production origin"]
+        9a["9a: dist directory"]
+        9b["9b: catch-all route"]
+        9d["9d: security check"]
+        9f["9f: SPA fallback"]
+    end
+   
+    subgraph Deployment["Docker Build"]
+        10a["10a: Node build stage"]
+        10b["10b: npm run build"]
+        10c["10c: Python stage"]
+        10d["10d: dist copy"]
+        10e["10e: uvicorn startup"]
+    end
+   
+    1a -->|receives poem request| 1c
+    5a -->|iterates poems| 1c
+    1c -->|analyzes| 1d
+    1d -->|extracts syllables| 1e
+   
+    1a -->|creates Poem object| 2a
+    2a -->|triggers stanzas property| 2c
+    2c -->|splits on blanks| 2d
+    2d -->|checks first line| 2e
+    2e -->|creates Line objects| 2f
+    2f -->|wraps in Stanza| 2g
+   
+    1d -->|gets syllables from| 3a
+    3a -->|accesses words| 3c
+    3c -->|splits text| 3d
+    3d -->|creates Word objects| 3e
+    3e -->|counts syllables| 3f
+   
+    3f -->|looks up in CMU| 4a
+    4a -->|found: phonetic count| 4b
+    4b -->|extracts phonemes| 4c
+    4a -->|not found: fallback| 4e
+    4e -->|counts vowel groups| 4f
+   
+    6a -->|resolves endpoint| 6c
+    6c -->|sends POST| 6d
+    6d -->|calls /analyze| 1a
+    1a -->|returns analysis| 6e
+    6e -->|updates state| 7a
+    7a -->|extracts fields| 7b
+    7b -->|formats output| 7c
+    7c -->|shows counts| 7e
+   
+    8a -->|allows requests from| 8b
+    8a -->|allows requests from| 8c
+    8b -->|dev environment| 6d
+    8c -->|production environment| 6d
+   
+    9b -->|serves static files| 9a
+    9d -->|validates path| 9f
+    9f -->|fallback to index.html| 7a
+   
+    10a -->|builds frontend| 10b
+    10b -->|outputs to| 10d
+    10c -->|runs backend| 10e
+    10d -->|provides dist to| 9a
+    10e -->|starts| 1a
+   
+    style Backend fill:#4a9eff,stroke:#1e40af,stroke-width:3px,color:#000
+    style Parsing fill:#22c55e,stroke:#15803d,stroke-width:3px,color:#000
+    style SyllableLogic fill:#fbbf24,stroke:#b45309,stroke-width:3px,color:#000
+    style CMUDict fill:#fb923c,stroke:#c2410c,stroke-width:3px,color:#000
+    style Frontend fill:#ec4899,stroke:#be185d,stroke-width:3px,color:#fff
+    style Integration fill:#06b6d4,stroke:#0e7490,stroke-width:3px,color:#000
+    style Deployment fill:#a855f7,stroke:#7e22ce,stroke-width:3px,color:#fff
+```
+
+### Component Overview
+
+**Backend (Python/FastAPI)**
+- `api.py` - REST endpoints, CORS, static file serving
+- `analyzer.py` - Analysis orchestration
+- `poem_model.py` - Poem domain model with cached properties
+- `parser.py` - Text parsing into structured objects
+- `domain_objects.py` - Word, Line, Stanza models
+- `syllable_counter.py` - CMU dictionary + fallback logic
+- `main.py` - CLI entry point
+
+**Frontend (React/Vite)**
+- `App.jsx` - Main application component
+- `UserInputBox.jsx` - Poem input form with API integration
+- `AnalysisOutputBox.jsx` - Formatted results display
+- Tailwind CSS for styling
+
+**Infrastructure**
+- Multi-stage Docker build (Node 20 → Python 3.12)
+- FastAPI serves built React app from `/dist`
+- Render deployment with environment-based configuration
+
+### Key Data Flows
+
+**CLI Flow:**
+```
+poems/*.txt
+  → read_poem_folder_and_return_names()
+  → write_poem_analysis()
+  → Poem(text, filepath)
+  → parse_into_stanzas() → list[Stanza]
+  → analyze_poem() → metrics dict
+  → write *_analysis.txt
+```
+
+**Web Flow:**
+```
+React form
+  → axios POST /analyze
+  → FastAPI endpoint
+  → Poem object creation
+  → Domain parsing (Stanza → Line → Word)
+  → Syllable counting (CMU → fallback)
+  → JSON response
+  → Formatted output rendering
+```
+
+**Deployment:**
+```
+Docker Stage 1 (Node): Build React → /dist
+Docker Stage 2 (Python): Copy /dist + run FastAPI
+Container → Render platform
+```
+
+### Core Design Principles
+
+- **Domain-driven structure** - Poem/Stanza/Line/Word objects over string manipulation
+- **Thin API layer** - FastAPI endpoints are wrappers, no business logic
+- **Single deployment** - Backend serves frontend static files
+- **Separation of concerns** - Parsing, analysis, and presentation are independent modules
+
+---
+
+## Detailed Design History
+
+### 1. Purpose of This Document
 
 This document describes the current architecture of **Oracle** — a Python tool for syllable counting and metrical analysis of English poetry using the CMU Pronouncing Dictionary.
 
@@ -13,7 +204,7 @@ It serves three main purposes:
 
 Last updated: January 2026 (web architecture expansion)
 
-## 2. Initial Design and Constraints
+### 2. Initial Design and Constraints
 
 **Starting point (late 2025):**
 - Very simple goal: read .txt poem files → count syllables per line → write basic analysis

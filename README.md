@@ -276,6 +276,8 @@ oracle-of-the-abyss/
 └── pyproject.toml               # Python project metadata
 ```
 
+For a detailed overview of the application architecture and data flow, see [Architecture.md](Architecture.md).
+
 ## Development
 
 ### Running Tests
