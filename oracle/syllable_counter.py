@@ -49,7 +49,7 @@ def count_syllables(word: str) -> list[int]:
     Note:
         Returns a list because some words have multiple pronunciations.
     """
-
+    # case sensitive check, in case CMU has the word with different capitalization
     if word in DICTIONARY_CMUDICT:
         return count_phonetically(word)
     word_lower = word.lower()
