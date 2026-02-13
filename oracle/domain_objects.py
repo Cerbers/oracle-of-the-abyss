@@ -4,10 +4,8 @@ Module for domain objects used in poem analysis.
 
 
 from dataclasses import dataclass
-from functools import cached_property
 from oracle.syllable_counter import count_syllables
 from typing import cast
-from oracle.syllable_counter import LETTERS
 
 @dataclass
 class Word:
