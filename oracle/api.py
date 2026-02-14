@@ -149,7 +149,7 @@ def health_check() -> dict[str, str]:
 _DIST_DIR = Path(__file__).parent.parent / "dist" 
 
 
-@app.get("/{full_path:path}")
+@app.get("/{full_path:path}", respone_model=None)
 async def serve_frontend(full_path: str) -> FileResponse | dict[str, str]:
     """
     Serve the built frontend from the dist directory.
