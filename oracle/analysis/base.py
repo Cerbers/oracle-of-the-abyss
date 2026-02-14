@@ -10,5 +10,5 @@ def poetic_devices(poem: Poem) -> list[Stanza]:
     return stanzas
  
 
-def anaphora(poem_stanza: Stanza) -> list[str]: 
+def anaphora(poem_stanza: Stanza) -> None: 
     pass
