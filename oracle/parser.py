@@ -23,6 +23,8 @@ def parse_into_stanzas(poem_text: str, poem_name: str) -> list[Stanza]:
         and handles multiple consecutive blank lines as a single stanza separator.
         The function returns a list of stanzas, where each stanza is a list of its lines.
     """
+    
+    # TODO add accounting for multiple poems in single file
 
     cleaned_text = '\n'.join(line.strip() for line in poem_text.splitlines())
     stanzas=cleaned_text.split('\n\n')
