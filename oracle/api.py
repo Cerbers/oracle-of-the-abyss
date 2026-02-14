@@ -59,13 +59,13 @@ class PoemAnalysisResult(BaseModel):
         error: Error message if analysis failed.
     """
     title: str
-    analysis: dict
+    analysis: dict[str, list[str] | list[int] | list[list[int]]]
     error: str | None = None
 
 
 
 @app.post("/analyze")
-def analyze_endpoint(request: PoemRequest):
+def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | list[list[int]]]:
     """
     Analyze a poem and return syllable counts per stanza.
 
@@ -88,7 +88,7 @@ def analyze_endpoint(request: PoemRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
     
 @app.post("/batch-analyze")
-def batch_analyze_endpoint(request: BatchPoemRequest):
+def batch_analyze_endpoint(request: BatchPoemRequest) -> dict[str, list[PoemAnalysisResult] | int]:
     """
     Analyze multiple poems in a single request.
 
@@ -124,7 +124,7 @@ def batch_analyze_endpoint(request: BatchPoemRequest):
 
     
 @app.get("/health")
-def health_check():
+def health_check() -> dict[str, str]:
     """Check if the API and its dependencies are running properly."""
 
     try:
@@ -150,7 +150,7 @@ _DIST_DIR = Path(__file__).parent.parent / "dist"
 
 
 @app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
+async def serve_frontend(full_path: str) -> FileResponse | dict[str, str]:
     """
     Serve the built frontend from the dist directory.
     
