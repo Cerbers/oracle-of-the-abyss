@@ -1,6 +1,6 @@
 # Oracle of the Abyss
 
-A full-stack poetry analysis application that counts syllables and identifies structural patterns in poems. Features a FastAPI backend and React frontend.
+A full-stack poetry analysis application that counts syllables, identifies structural patterns, and detects basic poetic devices in poems. Features a FastAPI backend and React frontend.
 
 ## Overview
 
@@ -14,6 +14,7 @@ Built with modular architecture that separates parsing, analysis, and data model
 - **Elision detection** for contractions like "o'er" and "you're"
 - **Automatic title detection** (quoted, all-caps, or filename-matching)
 - **Stanza structure analysis** with line and syllable counts per stanza
+- **Poetic device detection** (starting with anaphora-like repeated phrase patterns)
 - **Batch processing** for multiple poem files
 - **Fallback estimation** for words not in the CMU dictionary
 - **REST API** for programmatic access
@@ -63,6 +64,7 @@ uvicorn oracle.api:app --reload
 ```
 
 The API will be available at `http://localhost:8000`.
+The root path also serves the built frontend when `dist/index.html` exists (see Docker deployment), while API routes remain available for JSON requests.
 
 To run with the frontend in development mode, open a second terminal:
 
@@ -73,17 +75,6 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173`.
 
-### Running with Docker
-
-Build and run the complete application:
-
-```bash
-docker build -t oracle .
-docker run -p 8000:8000 oracle
-```
-
-This serves both the API and frontend at `http://localhost:8000`.
-
 ### CLI Usage
 
 Place your poem files (`.txt` or `.md` format) in the `user poems` folder and run:
@@ -93,16 +84,17 @@ poetry run python -m oracle.main
 
 This will generate analysis files for each poem with the suffix `_analysis.txt`.
 
+Empty or whitespace-only files in the source folder are ignored.
+
 Additionally you can specify a folder to read poems from:
 ```bash
 poetry run python -m oracle.main --folder "insert absolute or relative path"
 ```
 
-**Performance monitoring:**
+Enable performance timing output:
 ```bash
-poetry run python -m oracle.main --perf
+poetry run python -m oracle.main --perf --folder "insert absolute or relative path"
 ```
-
 
 ### Programmatic Usage
 
@@ -124,6 +116,7 @@ analysis = analyze_poem(poem)
 # Access results
 print(analysis['syllables_per_line'])  # [[5, 6, 9]]
 print(analysis['line_counts'])          # [3]
+print(analysis['poetic_devices'])       # [[]]
 ```
 
 ### Example Output
@@ -177,9 +170,12 @@ Analyze a single poem.
 {
   "stanza_texts": ["Born out of the void\nAmidst the stars of flesh"],
   "line_counts": [2],
-  "syllables_per_line": [[5, 6]]
+  "syllables_per_line": [[5, 6]],
+  "poetic_devices": [[]]
 }
 ```
+
+The `poetic_devices` field is a list of stanza-level detections produced by analysis heuristics.
 
 #### `POST /batch-analyze`
 
@@ -199,8 +195,26 @@ Analyze multiple poems in one request.
 ```json
 {
   "results": [
-    {"title": "Poem 1", "analysis": {...}, "error": null},
-    {"title": "Poem 2", "analysis": {...}, "error": null}
+    {
+      "title": "Poem 1",
+      "analysis": {
+        "stanza_texts": ["First stanza"],
+        "line_counts": [1],
+        "syllables_per_line": [[3]],
+        "poetic_devices": []
+      },
+      "error": null
+    },
+    {
+      "title": "Poem 2",
+      "analysis": {
+        "stanza_texts": ["Second stanza"],
+        "line_counts": [1],
+        "syllables_per_line": [[4]],
+        "poetic_devices": []
+      },
+      "error": null
+    }
   ],
   "total": 2
 }
@@ -227,7 +241,7 @@ The web interface provides an interactive way to analyze poems.
 
 - **Poem input form** with title and text fields
 - **Real-time analysis** via API integration
-- **Formatted output** displaying stanza structure and syllable counts
+- **Formatted output** displaying stanza structure and syllable counts from backend analysis
 - **Responsive design** using Tailwind CSS
 
 ### Technology Stack
@@ -252,6 +266,8 @@ oracle-of-the-abyss/
 │   ├── api.py                   # FastAPI application & REST endpoints
 │   ├── analyzer.py              # Main analysis orchestration
 │   ├── poem_model.py            # Poem dataclass with cached properties
+│   ├── analysis/                # Analysis extensions
+│   │   └── base.py              # Domain-level analysis helpers (anaphora)
 │   ├── parser.py                # Text parsing into domain objects
 │   ├── domain_objects.py        # Core domain models (Word, Line, Stanza)
 │   ├── syllable_counter.py      # Syllable counting logic
@@ -306,6 +322,10 @@ Testing is used as a safety net and as executable documentation of expected beha
 4. Strip punctuation and retry
 5. Fall back to vowel-group counting
 
+### Poetic Device Detection
+
+The `analyze_poem` pipeline additionally runs stanza-level heuristics (from `oracle/analysis/base.py`) to identify repeated leading-phrase patterns, currently surfaced as `poetic_devices` in API and CLI outputs.
+
 ### Handling Multiple Pronunciations
 
 Words with multiple pronunciations in the CMU dictionary currently use the first (most common) variant. Future versions will explore all pronunciation combinations to identify consistent metrical patterns.
@@ -343,7 +363,10 @@ I'm aware of these limitations and will address them as the project continues.
 
 - [ ] Support for multiple pronunciation variants per word
 - [ ] Pattern detection across stanzas (rhyme schemes, meter)
-- [ partially ] CLI with arguments for custom folders and output formats
+- [x] CLI with arguments for custom folders and performance mode
+
+- [ ] CLI output format options (JSON / markdown / plain text)
+
 - [ ] Improved error handling and user feedback
 - [ ] Performance optimization for large poem collections
 
