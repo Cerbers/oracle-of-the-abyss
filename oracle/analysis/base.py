@@ -10,35 +10,41 @@ def poetic_devices(poem: Poem) -> list[Stanza]:
     return stanzas
 
 
-def anaphora(poem_stanza: Stanza) -> None: 
-    # take first half of lines (n/2)
-    half_lines = poem_stanza.lines[:len(poem_stanza.lines) // 2]
-
-    if len(half_lines) <2:
+def anaphora(poem_stanza: Stanza) -> list[str]:
+    if len(poem_stanza.lines) < 2:
         return []
-
-    # start with 2-word patterns
-    pattern_length = 2
-
-    # get first pattern from line 1
-    words = half_lines[0].text.split()
-    if len(words) < pattern_length:
-        return []
+    
+    best_matches = []
+    
+    # Try patterns from 2 words up to (max words per line - 1)
+    max_words_per_line = max(len(line.text.split()) for line in poem_stanza.lines)
+    max_pattern_length = max_words_per_line - 1  # Don't use full lines
+    
+    for pattern_length in range(2, max_pattern_length + 1):
+        current_matches = []
         
-    current_pattern = ' '.join(words[:pattern_length]).lower().strip('.,!?":;')
-    matches = [current_pattern]
+        # Get all patterns of this length
+        patterns = []
+        for line in poem_stanza.lines:
+            words = line.text.split()
+            if len(words) >= pattern_length:
+                pattern = ' '.join(words[:pattern_length]).lower().strip('.,!?":;')
+                patterns.append(pattern)
+        
+        # Count pattern frequencies
+        pattern_counts = {}
+        for pattern in patterns:
+            pattern_counts[pattern] = pattern_counts.get(pattern, 0) + 1
+        
+        # Find patterns with max matches for this length
+        max_count = max(pattern_counts.values()) if pattern_counts else 0
+        if max_count > 1:  # At least 2 matches
+            for pattern, count in pattern_counts.items():
+                if count == max_count:
+                    current_matches.extend([pattern] * count)
+        
+        # Update best if this pattern length has same or more matches
+        if len(current_matches) >= len(best_matches) and len(current_matches) > 0:
+            best_matches = current_matches
     
-    # Compare with subsequent lines
-    for line in half_lines[1:]:
-        words = line.text.split()
-        if len(words) >= pattern_length:
-            line_pattern = ' '.join(words[:pattern_length]).lower().strip('.,!?":;')
-            if line_pattern == current_pattern:
-                matches.append(line_pattern)
-            else:
-                # Use this line's pattern as new comparison
-                current_pattern = line_pattern
-                matches = [current_pattern]
-    
-    # Return patterns that appeared more than once
-    return matches if len(matches) > 1 else []
+    return best_matches
