@@ -59,13 +59,13 @@ class PoemAnalysisResult(BaseModel):
         error: Error message if analysis failed.
     """
     title: str
-    analysis: dict[str, list[str] | list[int] | list[list[int]]]
+    analysis: dict[str, list[str] | list[int] | list[list[int]] | list[list[str]]]
     error: str | None = None
 
 
 
 @app.post("/analyze")
-def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | list[list[int]]]:
+def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | list[list[int]] | list[list[str]]]:
     """
     Analyze a poem and return syllable counts per stanza.
 
@@ -80,7 +80,7 @@ def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | 
             text=request.poem_text,
             filepath=Path(f"{request.title}.txt")
         )
-        result = analyze_poem(poem)
+        result: dict[str, list[str] | list[int] | list[list[int]] | list[list[str]]] = analyze_poem(poem)
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

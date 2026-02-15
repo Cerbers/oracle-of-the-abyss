@@ -28,7 +28,8 @@ def test_analyze_poem_has_stanzas_in_list():
             "Gazes into the weary eyes of a lost stalker\nWho lies in blood-flow of the night"
         ],
         'line_counts': [4, 2],
-        'syllables_per_line': [[5, 6, 9, 7], [13, 8]]
+        'syllables_per_line': [[5, 6, 9, 7], [13, 8]],
+        'poetic_devices': [[], []]
     }
     
     assert analysis == expected, f"Poem analysis did not match expected output. Instead got: {analysis}"

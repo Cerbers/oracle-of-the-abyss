@@ -2,19 +2,13 @@ from oracle.poem_model import Poem
 from oracle.domain_objects import Stanza
 
 
-stanzas = []
-
-def poetic_devices(poem: Poem) -> list[Stanza]:
-    for stanza in poem.stanzas:
-        stanzas.append(stanza)
-    return stanzas
 
 
 def anaphora(poem_stanza: Stanza) -> list[str]:
     if len(poem_stanza.lines) < 2:
         return []
     
-    best_matches = []
+    best_matches: list[str] = []
     
     # Try patterns from 2 words up to (max words per line - 1)
     max_words_per_line = max(len(line.text.split()) for line in poem_stanza.lines)
@@ -32,7 +26,7 @@ def anaphora(poem_stanza: Stanza) -> list[str]:
                 patterns.append(pattern)
         
         # Count pattern frequencies
-        pattern_counts = {}
+        pattern_counts: dict[str, int] = {}
         for pattern in patterns:
             pattern_counts[pattern] = pattern_counts.get(pattern, 0) + 1
         

@@ -60,7 +60,11 @@ def read_poem_file_and_return_content(file_path: str) -> str:
     except FileNotFoundError:
         print(f"Error: The file at {file_path} was not found.")
         return ""
-    
+
+
+
+# TODO: figure out where poetic devices should be handled and how should they be printed
+
 def write_poem_analysis(file_path: str) -> None:
     """
     Analyzes a poem and writes the results to a text file.
@@ -82,17 +86,20 @@ def write_poem_analysis(file_path: str) -> None:
     output_path = input_path.with_name(input_path.stem + "_analysis.txt")
     with open(output_path, 'w', encoding='utf-8') as file:
         # Iterate through each stanza's data together
-        for i, (text, line_count, syllables) in enumerate(
+        for i, (text, line_count, syllables, poetic_devices) in enumerate(
             zip(
                 analysis_result['stanza_texts'],
                 analysis_result['line_counts'],
-                analysis_result['syllables_per_line']
+                analysis_result['syllables_per_line'],
+                analysis_result['poetic_devices']
             ), start=1
         ):
             file.write(f"Stanza {i}:\n")
             file.write(f"{text}\n")
             file.write(f"Lines: {line_count}\n")
             file.write(f"Syllables per line: {syllables}\n\n")
+            if poetic_devices:
+                file.write(f"Anaphora: {poetic_devices}\n\n")
 
 
 @watch_running_time_of_function
