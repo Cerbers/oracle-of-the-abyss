@@ -2,9 +2,18 @@ from oracle.poem_model import Poem
 from oracle.domain_objects import Stanza
 
 
-
+# TODO: breakup anaphora into multiple functions
 
 def anaphora(poem_stanza: Stanza) -> list[str]:
+    """
+    Analyzes a stanza for anaphora (repetition of word patterns).
+    
+    Args:
+        poem_stanza: The stanza to analyze.
+    
+    Returns:
+        A list of repeated word patterns found in the stanza.
+    """
     if len(poem_stanza.lines) < 2:
         return []
     
