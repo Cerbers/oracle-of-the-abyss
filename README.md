@@ -380,5 +380,7 @@ This is a personal learning project, but suggestions and feedback are welcome! F
 
 ## Acknowledgments
 
-- CMU Pronouncing Dictionary for phonetic data
-- NLTK for dictionary access
+- CMU Pronouncing Dictionary for phonetic data  
+- NLTK (Apache License 2.0) for dictionary access  
+
+See `LICENSE` (MIT) for this project's license, `LICENSE-APACHE` for NLTK's license, and `LICENSE-CMU` for the CMU Pronouncing Dictionary's license.
