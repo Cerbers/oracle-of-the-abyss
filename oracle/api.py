@@ -124,18 +124,25 @@ def batch_analyze_endpoint(request: BatchPoemRequest) -> dict[str, list[PoemAnal
 
     
 @app.get("/health")
-def health_check() -> dict[str, str]:
+def health_check() -> dict[str, str | int]:
     """Check if the API and its dependencies are running properly."""
 
     try:
         #Test that syllable counter is accessible
         from oracle.syllable_counter import count_syllables
-        test_count = count_syllables("test")
+        test_count = count_syllables("rhythm")
+        if test_count == 2:
+            test_count = "CMU works correctly"
+        elif test_count == 1:
+            test_count = "CMU failed but fallback counter works"
+        else:
+            test_count = "Both CMU and fallback counter failed"
 
         return {
             "status": "healthy",
             "syllable_counter": "operational",
-            "cmu_dict": "loaded"
+            "cmu_dict": "loaded",
+            "test_count": test_count
         }
     except Exception as e:
         return {

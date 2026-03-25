@@ -1,6 +1,5 @@
 import pytest
 from fastapi.testclient import TestClient
-from pathlib import Path
 from oracle.api import app, PoemRequest, BatchPoemRequest, PoemAnalysisResult
 
 
@@ -231,15 +230,15 @@ class TestHealthCheckEndpoint:
         """Test that health check endpoint returns 200 OK."""
         response = client.get("/health")
         
-        assert response.status_code == 200
+        assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
 
     def test_health_check_returns_status_field(self):
         """Test that health check returns a status field."""
         response = client.get("/health")
         
         data = response.json()
-        assert "status" in data
-        assert data["status"] in ["healthy", "unhealthy"]
+        assert "status" in data, f"Response missing 'status' field. Got: {data}"
+        assert data["status"] in ["healthy", "unhealthy"], f"Invalid status value: {data['status']}"
 
     def test_health_check_returns_syllable_counter_status(self):
         """Test that health check includes syllable counter status."""
@@ -247,10 +246,19 @@ class TestHealthCheckEndpoint:
         
         data = response.json()
         if data["status"] == "healthy":
-            assert "syllable_counter" in data
-            assert data["syllable_counter"] == "operational"
-            assert "cmu_dict" in data
-            assert data["cmu_dict"] == "loaded"
+            assert "syllable_counter" in data, f"Healthy response missing 'syllable_counter' field. Got: {data}"
+            assert data["syllable_counter"] == "operational", f"Expected syllable_counter 'operational', got: {data['syllable_counter']}"
+            assert "cmu_dict" in data, f"Healthy response missing 'cmu_dict' field. Got: {data}"
+            assert data["cmu_dict"] == "loaded", f"Expected cmu_dict 'loaded', got: {data['cmu_dict']}"
+
+    def test_health_check_returns_test_count(self):
+        """Test that health check includes test count."""
+        response = client.get("/health")
+        
+        data = response.json()
+        if data["status"] == "healthy":
+            assert "test_count" in data, f"Healthy response missing 'test_count' field. Got: {data}"
+            assert data["test_count"] in ["CMU works correctly", "CMU failed but fallback counter works", "Both CMU and fallback counter failed"], f"Invalid test_count value: {data['test_count']}"
 
 
 class TestPoemRequestModel:
