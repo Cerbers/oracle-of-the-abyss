@@ -2,20 +2,40 @@
 Syllable counting module for the Oracle Poetry Analyzer.
 """
 
+# This project uses NLTK under the Apache License 2.0.
+# See LICENSE-APACHE for the full license text.
+
 import nltk # type: ignore[import-untyped]
 from nltk.corpus import cmudict # type: ignore[import-untyped]
 
 
 try:
-    DICTIONARY_CMUDICT = cmudict.dict()
+    DICTIONARY_CMUDICT = cmudict.dict() 
 except LookupError:
     nltk.download('cmudict', quiet=True)
-    DICTIONARY_CMUDICT = cmudict.dict()
+    DICTIONARY_CMUDICT = cmudict.dict() # pyright: ignore[reportConstantRedefinition]
 
 # TODO increase accuracy of count_syllables by adding more rules
 VOWELS = "aeiouy"
 CONSONANTS = "bcdfghjklmnpqrstvwxyz"
 LETTERS = VOWELS + CONSONANTS
+
+# TODO: Check if this function is being tested
+def get_phonemes(word: str) -> list[list[str]]:
+    """
+    Returns CMU pronunciations for a word as a list of phoneme lists.
+
+    Args:
+        word: The word to look up.
+
+    Returns:
+        A list of pronunciations; each pronunciation is a list of phoneme strings.
+        Returns an empty list if the word is not in the CMU dictionary.
+    """
+    word_lower = word.lower().strip(".,;:!?\"'()[]{}#*_")
+    if word_lower in DICTIONARY_CMUDICT:
+        return DICTIONARY_CMUDICT[word_lower]
+    return []
 
 
 def count_phonetically(word: str) -> list[int]:

@@ -4,9 +4,11 @@ Module for domain objects used in poem analysis.
 
 
 from dataclasses import dataclass
-from oracle.syllable_counter import count_syllables
+from oracle.syllable_counter import count_syllables, get_phonemes
 from typing import cast
 
+
+# TODO: Update Word class docs
 @dataclass
 class Word:
     """
@@ -29,6 +31,11 @@ class Word:
     def syllable_variants(self) -> list[int]:
         """Returns a list of possible syllable counts for the word."""
         return count_syllables(self.text)
+
+    @property
+    def phonemes(self) -> list[list[str]]:
+        """Returns CMU pronunciations for the word (phonetic container)."""
+        return get_phonemes(self.text)
 
 
 @dataclass
