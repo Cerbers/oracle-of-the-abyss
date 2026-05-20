@@ -30,17 +30,20 @@ def _rhyme_sound(word_text: str) -> str:
     stripped = word_text.lower().strip('.,!?":;\'')
     return stripped[-2:] if len(stripped) >= 2 else stripped
 
-
+# TODO: Add reliable, flexible support for more complex rhyme patterns
 def _name_scheme(pattern: str) -> str:
     """"""
     if len(set(pattern)) == 1:
         return "Monorhyme"
-    if pattern == "AABB":
+    if pattern in "AABBCCDDEEFFGG":
         return "Rhyming Couplets"
-    if pattern == "ABAB":
+    if pattern in "ABABABABABABABAB":
         return "Alternating Rhyme"
     if pattern == "ABBA":
         return "Enclosed Rhyme"
+    elif pattern == pattern[::-1]:
+        return "Mirrored Rhyme" # Technically it's 'Enclosed Rhyme' but for clarity and personal preference
+                                # We're going to call it 'Mirrored Rhyme' leaving ER for 4 line stanza pattern
     return "No recognized rhyme pattern"
 
 
@@ -66,10 +69,10 @@ def detect_rhymes(poem_stanza: Stanza) -> list[str]:
 
     # Assign letters to unique sounds in order of first appearance
     sound_to_letter: dict[str, str] = {}
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for sound in sounds:
         if sound not in sound_to_letter:
-            sound_to_letter[sound] = letters[len(sound_to_letter)]
+            sound_to_letter[sound] = LETTERS[len(sound_to_letter)]
 
     pattern = ''.join(sound_to_letter[s] for s in sounds)
     name = _name_scheme(pattern)

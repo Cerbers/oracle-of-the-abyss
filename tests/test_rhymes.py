@@ -1,7 +1,3 @@
-
-
-
-
 from oracle.analysis.rhymes import detect_rhymes
 from oracle.domain_objects import Stanza, Line
 import pytest
@@ -10,7 +6,7 @@ import pytest
 # detect_rhymes tests
 # ---------------------------------------------------------------------------
 
-
+# TODO: Add more test cases for different rhyme lengths and patterns
 
 
 @pytest.mark.parametrize("lines_text,expected", [
@@ -23,6 +19,18 @@ import pytest
             "without a mark",
         ],
         ["AABB", "Rhyming Couplets"],
+    ),
+    # AABBCC – Rhyming Couplets extended
+    (
+        [
+            "I lie awake",
+            "before the break",
+            "alone in the dark",
+            "without a mark",
+            "I think of love",
+            "the stars above",
+        ],
+        ["AABBCC", "Rhyming Couplets"],
     ),
     # ABAB – Alternating Rhyme: day/way share EY1, night/light share AY1 T
     (
@@ -44,6 +52,18 @@ import pytest
         ],
         ["ABBA", "Enclosed Rhyme"],
     ),
+    # ABCCBA - Mirrored Rhyme
+    (
+        [
+            "I stood before the gate",
+            "and watched the falling night",
+            "day",
+            "may",
+            "until the morning light",
+            "decided by my fate",
+        ],
+        ["ABCCBA", "Mirrored Rhyme"],
+    ),
     # Monorhyme: love/above/dove/shove all share AH1 V
     (
         [
@@ -54,7 +74,7 @@ import pytest
         ],
         ["AAAA", "Monorhyme"],
     ),
-    # No named scheme – ABCB (sky/die rhyme, earth and home don't)
+    # TODO: it should return Simple Four-Line Rhyme
     (
         [
             "I walk the earth",
