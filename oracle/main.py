@@ -37,7 +37,7 @@ def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
 
 
 
-def read_poem_file_and_return_content(file_path: str) -> str:
+def read_poem_file_and_return_content(file_path: str) -> str | None:
     """
     Reads a poem from a text file and returns its content.
     
@@ -59,7 +59,7 @@ def read_poem_file_and_return_content(file_path: str) -> str:
     
     except FileNotFoundError:
         print(f"Error: The file at {file_path} was not found.")
-        return ""
+        return None
 
 
 
@@ -68,13 +68,6 @@ def read_poem_file_and_return_content(file_path: str) -> str:
 def write_poem_analysis(file_path: str) -> None:
     """
     Analyzes a poem and writes the results to a text file.
-    
-    Args:
-        file_path: The path to the poem file to analyze.
-    
-    Note:
-        Creates an output file with '_analysis.txt' suffix containing
-        stanza breakdowns, line counts, and syllable counts.
     """
     input_path = Path(file_path)
 
@@ -85,8 +78,7 @@ def write_poem_analysis(file_path: str) -> None:
     
     output_path = input_path.with_name(input_path.stem + "_analysis.txt")
     with open(output_path, 'w', encoding='utf-8') as file:
-        # Iterate through each stanza's data together
-        for i, (text, line_count, syllables, poetic_devices) in enumerate(
+        for i, (text, line_count, syllables, poetic_data) in enumerate(
             zip(
                 analysis_result['stanza_texts'],
                 analysis_result['line_counts'],
@@ -98,8 +90,11 @@ def write_poem_analysis(file_path: str) -> None:
             file.write(f"{text}\n")
             file.write(f"Lines: {line_count}\n")
             file.write(f"Syllables per line: {syllables}\n\n")
-            if poetic_devices:
-                file.write(f"Anaphora: {poetic_devices}\n\n")
+            
+            # New: prints EVERY poetic analysis (anaphora, rhymes, future ones…)
+            for name, value in poetic_data.items():
+                if value:   # only print if we actually found something
+                    file.write(f"{name.capitalize()}: {value}\n\n")
 
 
 @watch_running_time_of_function

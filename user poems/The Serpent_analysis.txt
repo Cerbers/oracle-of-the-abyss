@@ -4,9 +4,13 @@ We thrive
 Lines: 2
 Syllables per line: [4, 2]
 
+Rhymes: ['AB']
+
 Stanza 2:
 In its anger
 We quake
 Lines: 2
 Syllables per line: [4, 2]
+
+Rhymes: ['AB']
 

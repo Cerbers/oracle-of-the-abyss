@@ -2,7 +2,7 @@ from oracle.main import read_poem_file_and_return_content, write_poem_analysis, 
 read_multiple_poem_files_and_write_analyses
 from pathlib import Path
 
-# TODO add test for error handling in read_poem_file_and_return_content
+
 
 def test_read_poem_folder_and_return_names_excludes_analysis_files(tmp_path):
     """Test that analysis files are excluded when reading poem folder."""
@@ -39,7 +39,7 @@ def test_read_poem_file_and_return_content_from_real_example(capsys):
 
     poem_content = read_poem_file_and_return_content(str(example_file))
     captured = capsys.readouterr()
-    assert poem_content.strip() != "", "Real example file should not be empty."
+    assert poem_content.strip() != "", f"Real example file should not be empty. stdout: {captured.out!r}, stderr: {captured.err!r}"
 
 def test_read_poem_file_and_return_content_with_tmp_path(tmp_path):
     """Test reading a poem file with controlled test data using tmp_path."""
@@ -55,7 +55,7 @@ def test_read_poem_file_and_return_content_file_not_found(tmp_path: Path, capsys
     non_existent = tmp_path / "missing.txt"
     poem_content = read_poem_file_and_return_content(str(non_existent))
     captured = capsys.readouterr()
-    assert poem_content == "", "Should return empty on missing file."
+    assert poem_content is None, "Should return None on missing file."
     assert "Error: The file at" in captured.out, "Should print specific error message"
     assert str(non_existent) in captured.out, "Error message should include the attempted path"
 
@@ -94,7 +94,6 @@ def test_poem_files_are_not_empty(tmp_path):
 
 def test_read_multiple_poem_files_and_write_analyses(tmp_path: Path):
     """Verify that multiple non-empty poem files get analysis files created."""
-    #   Arrange 
 
     poem_folder = tmp_path / "poems"
     poem_folder.mkdir()
@@ -114,7 +113,6 @@ def test_read_multiple_poem_files_and_write_analyses(tmp_path: Path):
     # Call the real function, but point it to controlled folder
     read_multiple_poem_files_and_write_analyses(folder_path=str(poem_folder))
 
-    #   Assert
 
     analysis_files = list(poem_folder.glob("*_analysis.txt"))
     assert len(analysis_files) == 3, f"Expected 3 analyses, got {len(analysis_files)}"

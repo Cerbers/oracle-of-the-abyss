@@ -29,7 +29,10 @@ def test_analyze_poem_has_stanzas_in_list():
         ],
         'line_counts': [4, 2],
         'syllables_per_line': [[5, 6, 9, 7], [13, 8]],
-        'poetic_devices': [[], []]
+        'poetic_devices': [
+            {'anaphora': [], 'rhymes': ['ABCD', 'No recognized rhyme pattern']},
+            {'anaphora': [], 'rhymes': ['AB', 'No recognized rhyme pattern']},
+        ]
     }
     
     assert analysis == expected, f"Poem analysis did not match expected output. Instead got: {analysis}"
