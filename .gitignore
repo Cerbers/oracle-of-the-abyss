@@ -13,3 +13,5 @@ cloc.exe
 cloc
 .claude/settings.local.json
 user poems/The Dominion of Lies.txt
+
+AGENTS.md

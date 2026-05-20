@@ -10,6 +10,24 @@ import pytest
 
 
 @pytest.mark.parametrize("lines_text,expected", [
+    # Monorhyme: love/above/dove/shove all share AH1 V
+    (
+        [
+            "I think of love",
+            "the stars above",
+            "the morning dove",
+            "a gentle shove",
+        ],
+        ["AAAA", "Monorhyme"],
+    ),
+])
+def test_monorhyme(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # AABB – Rhyming Couplets: awake/break share EY1 K, dark/mark share AA1 R K
     (
         [
@@ -32,6 +50,14 @@ import pytest
         ],
         ["AABBCC", "Rhyming Couplets"],
     ),
+])
+def test_couplets(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # ABAB – Alternating Rhyme: day/way share EY1, night/light share AY1 T
     (
         [
@@ -42,6 +68,27 @@ import pytest
         ],
         ["ABAB", "Alternating Rhyme"],
     ),
+    # ABCABC – Alternating Rhyme extended
+    (
+        [
+            "day",
+            "night",
+            "marrow",
+            "may",
+            "light",
+            "burrow"
+
+        ],
+        ["ABCABC", "Alternating Rhyme"],
+    )
+])
+def test_alternating_rhyme(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # ABBA – Enclosed Rhyme: gate/fate share EY1 T, night/light share AY1 T
     (
         [
@@ -52,6 +99,14 @@ import pytest
         ],
         ["ABBA", "Enclosed Rhyme"],
     ),
+])
+def test_enclosed_rhyme(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # ABCCBA - Mirrored Rhyme
     (
         [
@@ -64,16 +119,14 @@ import pytest
         ],
         ["ABCCBA", "Mirrored Rhyme"],
     ),
-    # Monorhyme: love/above/dove/shove all share AH1 V
-    (
-        [
-            "I think of love",
-            "the stars above",
-            "the morning dove",
-            "a gentle shove",
-        ],
-        ["AAAA", "Monorhyme"],
-    ),
+])
+def test_mirrored_rhyme(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # TODO: it should return Simple Four-Line Rhyme
     (
         [
@@ -84,14 +137,26 @@ import pytest
         ],
         ["ABCB", "No recognized rhyme pattern"],
     ),
+])
+def test_simple_four_line_rhyme(lines_text, expected):
+    stanza = Stanza(lines=[Line(text=t) for t in lines_text])
+    result = detect_rhymes(stanza)
+    assert result == expected
+
+
+@pytest.mark.parametrize("lines_text,expected", [
     # Fewer than 2 lines → empty
     (
         ["Only one line here"],
         [],
     ),
+    # two lines with different rhymes
+    (
+        ["day", "night"],
+        ["AB", "No recognized rhyme pattern"],
+    ),
 ])
-def test_rhyme_detection_scenarios(lines_text, expected):
-    """Test rhyme scheme detection across named and unnamed patterns."""
+def test_edge_cases(lines_text, expected):
     stanza = Stanza(lines=[Line(text=t) for t in lines_text])
     result = detect_rhymes(stanza)
     assert result == expected
