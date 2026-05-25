@@ -5,10 +5,16 @@ API module for the Oracle Poetry Analyzer.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+
 from pydantic import BaseModel
 from pathlib import Path
-from oracle.analyzer import analyze_poem
+
+from typing import TypeAlias
+
+from oracle.analyzer import analyze_poem, AnalysisResult
 from oracle.poem_model import Poem
+
+PoemAnalysisResultType: TypeAlias = AnalysisResult
 
 app = FastAPI(
     title="Oracle Poetry Analyzer API",
@@ -59,13 +65,13 @@ class PoemAnalysisResult(BaseModel):
         error: Error message if analysis failed.
     """
     title: str
-    analysis: dict[str, list[str] | list[int] | list[list[int]] | list[list[str]] | list[dict[str, list[str]]]]
+    analysis: PoemAnalysisResultType
     error: str | None = None
 
 
 
 @app.post("/analyze")
-def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | list[list[int]] | list[list[str]] | list[dict[str, list[str]]]]:
+def analyze_endpoint(request: PoemRequest) -> PoemAnalysisResultType:
     """
     Analyze a poem and return syllable counts per stanza.
 
@@ -80,7 +86,7 @@ def analyze_endpoint(request: PoemRequest) -> dict[str, list[str] | list[int] | 
             text=request.poem_text,
             filepath=Path(f"{request.title}.txt")
         )
-        result: dict[str, list[str] | list[int] | list[list[int]] | list[list[str]] | list[dict[str, list[str]]]] = analyze_poem(poem)
+        result = analyze_poem(poem)
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -117,7 +123,12 @@ def batch_analyze_endpoint(request: BatchPoemRequest) -> dict[str, list[PoemAnal
         except Exception as e:
             results.append(PoemAnalysisResult(
                 title=poem_request.title,
-                analysis={},
+                analysis={
+                    "stanza_texts": [],
+                    "line_counts": [],
+                    "syllables_per_line": [],
+                    "poetic_devices": [],
+                },
                 error=str(e)
             ))
     return {"results": results, "total": len(results)}
@@ -130,19 +141,22 @@ def health_check() -> dict[str, str | int]:
     try:
         #Test that syllable counter is accessible
         from oracle.syllable_counter import count_syllables
-        test_count = count_syllables("rhythm")
+        test_count_word = count_syllables("rhythm")
+        test_count = test_count_word[0]
         if test_count == 2:
-            test_count = "CMU works correctly"
+            message = "CMU works correctly"  
         elif test_count == 1:
-            test_count = "CMU failed but fallback counter works"
+            message = "CMU failed but fallback counter works"
         else:
-            test_count = "Both CMU and fallback counter failed"
+            message = "Both CMU and fallback counter failed"
 
         return {
             "status": "healthy",
             "syllable_counter": "operational",
             "cmu_dict": "loaded",
-            "test_count": test_count
+            "message": message,
+            "test_word": "rhythm",
+            "test_word_syllables_count": test_count_word[0]
         }
     except Exception as e:
         return {

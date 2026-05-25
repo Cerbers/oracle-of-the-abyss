@@ -2,12 +2,20 @@
 Analyzer module for poem analysis.
 """
 
+from typing import TypedDict
+
 from oracle.poem_model import Poem
 # from oracle.domain_objects import Stanza
 from oracle.intern.lookout import watch_running_time_of_function
 from oracle.analysis.base import anaphora
 from oracle.analysis.rhymes import detect_rhymes
 
+
+class AnalysisResult(TypedDict):
+    stanza_texts: list[str]
+    line_counts: list[int]
+    syllables_per_line: list[list[int]]
+    poetic_devices: list[dict[str, list[str]]]
 
 POETIC_ANALYZERS = {
     'anaphora': anaphora,
@@ -17,7 +25,7 @@ POETIC_ANALYZERS = {
 
 # TODO: break the analyze_poem to create pipeline for anlysis efficiently
 @watch_running_time_of_function
-def analyze_poem(poem: Poem) -> dict[str, list[str] | list[int] | list[list[int]] | list[dict[str, list[str]]]]:
+def analyze_poem(poem: Poem) -> AnalysisResult:
     """
     Analyze poem using domain objects.
     """
@@ -37,13 +45,13 @@ def analyze_poem(poem: Poem) -> dict[str, list[str] | list[int] | list[list[int]
 
 
 # TODO: Add tests
-def create_analysis_baseline(poem: Poem) -> dict:
+def create_analysis_baseline(poem: Poem) -> AnalysisResult:
     """
     Only the fast structural stuff. Poetic analyses are moved to the parallel runner.
     """
-    stanza_texts = []
-    line_counts = []
-    syllables_per_line = []
+    stanza_texts: list[str] = []
+    line_counts: list[int] = []
+    syllables_per_line: list[list[int]] = []
     
     for stanza_obj in poem.stanzas:  
         stanza_texts.append(stanza_obj.stanza_text_string)
@@ -56,5 +64,5 @@ def create_analysis_baseline(poem: Poem) -> dict:
         'stanza_texts': stanza_texts,
         'line_counts': line_counts,
         'syllables_per_line': syllables_per_line,
-        # 'poetic_devices' is added afterwards in analyze_poem
+        'poetic_devices': [],
     }

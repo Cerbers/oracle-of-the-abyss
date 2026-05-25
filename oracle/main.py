@@ -1,15 +1,16 @@
 """
 Main module for the Oracle Poetry Analyzer.
 """
+from pathlib import Path
+
 
 from oracle.analyzer import analyze_poem
-from pathlib import Path
+
 from oracle.poem_model import Poem
 from oracle.intern.lookout import watch_running_time_of_function
 
 # TODO improve read_poem_file_and_return_content with error handling
 # TODO improve write_poem_analysis to format analysis nicely
-
 
 
 def read_poem_folder_and_return_names(folder_path: str) -> list[str]:
@@ -71,7 +72,12 @@ def write_poem_analysis(file_path: str) -> None:
     """
     input_path = Path(file_path)
 
+
     poem_text = read_poem_file_and_return_content(file_path)
+    # TODO: add tests for what happens when poem_text is None
+    if poem_text is None:
+        return
+
     poem_obj = Poem(text=poem_text, filepath=input_path)
 
     analysis_result = analyze_poem(poem_obj)

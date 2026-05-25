@@ -98,7 +98,7 @@ def _name_scheme(pattern: str) -> str:
     return "No recognized rhyme pattern"
 
 
-def _find_repeating_unit(pattern: str):
+def _find_repeating_unit(pattern: str) -> str | None:
     """Private function to find repeating units in a pattern."""
     if pattern[0] == pattern[-1]:
         return "Monorhyme"
@@ -113,7 +113,7 @@ def _find_repeating_unit(pattern: str):
             return unit
     return None # No repeating unit found
 
-def _check_for_pairs(pattern: str):
+def _check_for_pairs(pattern: str) -> list[str] | None:
     """Private function to find pairs in a pattern."""
     if len(pattern) % 2 != 0:
         return None

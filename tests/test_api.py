@@ -251,14 +251,14 @@ class TestHealthCheckEndpoint:
             assert "cmu_dict" in data, f"Healthy response missing 'cmu_dict' field. Got: {data}"
             assert data["cmu_dict"] == "loaded", f"Expected cmu_dict 'loaded', got: {data['cmu_dict']}"
 
-    def test_health_check_returns_test_count(self):
-        """Test that health check includes test count."""
+    def test_health_check_returns_message(self):
+        """Test that health check includes message."""
         response = client.get("/health")
         
         data = response.json()
         if data["status"] == "healthy":
-            assert "test_count" in data, f"Healthy response missing 'test_count' field. Got: {data}"
-            assert data["test_count"] in ["CMU works correctly", "CMU failed but fallback counter works", "Both CMU and fallback counter failed"], f"Invalid test_count value: {data['test_count']}"
+            assert "message" in data, f"Healthy response missing 'message' field. Got: {data}"
+            assert data["message"] in ["CMU works correctly", "CMU failed but fallback counter works", "Both CMU and fallback counter failed"], f"Invalid message value: {data['message']}"
 
 
 class TestPoemRequestModel:
@@ -317,19 +317,19 @@ class TestPoemAnalysisResultModel:
         """Test creating a successful PoemAnalysisResult."""
         result = PoemAnalysisResult(
             title="Test",
-            analysis={"stanza_texts": [], "line_counts": [], "syllables_per_line": []},
+            analysis={"stanza_texts": [], "line_counts": [], "syllables_per_line": [], "poetic_devices": []},
             error=None
         )
         
         assert result.title == "Test"
-        assert result.analysis == {"stanza_texts": [], "line_counts": [], "syllables_per_line": []}
+        assert result.analysis == {"stanza_texts": [], "line_counts": [], "syllables_per_line": [], "poetic_devices": []}
         assert result.error is None
 
     def test_poem_analysis_result_with_error(self):
         """Test creating a PoemAnalysisResult with an error."""
         result = PoemAnalysisResult(
             title="Failed",
-            analysis={},
+            analysis={"stanza_texts": [], "line_counts": [], "syllables_per_line": [], "poetic_devices": []},
             error="Analysis failed"
         )
         
@@ -340,7 +340,7 @@ class TestPoemAnalysisResultModel:
         """Test that error field defaults to None."""
         result = PoemAnalysisResult(
             title="Test",
-            analysis={}
+            analysis={"stanza_texts": [], "line_counts": [], "syllables_per_line": [], "poetic_devices": []}
         )
         
         assert result.error is None
