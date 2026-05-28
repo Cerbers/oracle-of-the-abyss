@@ -31,7 +31,12 @@ def parse_into_stanzas(poem_text: str, poem_name: str) -> list[Stanza]:
 
     result = []
     for stanza in stanzas:
-        lines = [line.strip('#*') for line in stanza.split('\n') if line.strip()]
+        lines = [line.strip('#* ') for line in stanza.split('\n') if line.strip()]
+        # print(f"Lines: {lines}")
+
+        if not lines:
+            continue
+
         if check_for_title_line(lines[0], poem_name):
             lines = lines[1:]
         if lines:

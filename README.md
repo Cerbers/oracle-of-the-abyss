@@ -14,7 +14,7 @@ Built with modular architecture that separates parsing, analysis, and data model
 - **Elision detection** for contractions like "o'er" and "you're"
 - **Automatic title detection** (quoted, all-caps, or filename-matching)
 - **Stanza structure analysis** with line and syllable counts per stanza
-- **Poetic device detection** (starting with anaphora-like repeated phrase patterns)
+- **Poetic device detection**: Anaphora, rhymes
 - **Batch processing** for multiple poem files
 - **Fallback estimation** for words not in the CMU dictionary
 - **REST API** for programmatic access
@@ -267,7 +267,8 @@ oracle-of-the-abyss/
 │   ├── analyzer.py              # Main analysis orchestration
 │   ├── poem_model.py            # Poem dataclass with cached properties
 │   ├── analysis/                # Analysis extensions
-│   │   └── base.py              # Domain-level analysis helpers (anaphora)
+│   │   ├── base.py              # Domain-level analysis helpers (anaphora)
+│   │   └── rhymes.py            # Rhyme detection module (rhyme scheme, end rhymes)
 │   ├── parser.py                # Text parsing into domain objects
 │   ├── domain_objects.py        # Core domain models (Word, Line, Stanza)
 │   ├── syllable_counter.py      # Syllable counting logic
@@ -310,7 +311,6 @@ Testing is used as a safety net and as executable documentation of expected beha
 - Tests are added when behavior becomes clear and stable
 - Exploratory implementation may precede tests for heuristic or algorithmic components
 - Architecture favors modular design and explicit domain objects over quick fixes
-- Inheritance is kept shallow (maximum one level) in favor of composition
 
 ## Technical Details
 

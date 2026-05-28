@@ -5,7 +5,6 @@ Analyzer module for poem analysis.
 from typing import TypedDict
 
 from oracle.poem_model import Poem
-# from oracle.domain_objects import Stanza
 from oracle.intern.lookout import watch_running_time_of_function
 from oracle.analysis.base import anaphora
 from oracle.analysis.rhymes import detect_rhymes
@@ -66,3 +65,5 @@ def create_analysis_baseline(poem: Poem) -> AnalysisResult:
         'syllables_per_line': syllables_per_line,
         'poetic_devices': [],
     }
+
+

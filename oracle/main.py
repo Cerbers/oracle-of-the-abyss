@@ -129,9 +129,11 @@ def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems")
 
     for poem_file_name in poem_file_names:
         poem_file_path = folder / poem_file_name
+        # print(f"Processing {poem_file_name}...")
         write_poem_analysis(str(poem_file_path))
+        # print(f"Finished processing {poem_file_name}.")
 
-
+# TODO: Add option to choose target folder for analyzed poems, by default it's same as read folder
 if __name__ == "__main__":
     import argparse
     import os
