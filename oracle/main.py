@@ -102,7 +102,7 @@ def write_poem_analysis(file_path: str) -> None:
                 if value:   # only print if we actually found something
                     file.write(f"{name.capitalize()}: {value}\n\n")
 
-
+# TODO: make program not crash when one file is corrupted
 @watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
     """

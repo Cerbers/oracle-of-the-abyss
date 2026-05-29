@@ -6,7 +6,7 @@ from oracle.domain_objects import Stanza, Line
 from oracle.parser import parse_into_stanzas
 
 
-# Test data: poems with title + two stanzas separated by varying blank lines
+
 POEM_WITH_QUOTED_TITLE_SINGLE_BLANK = """"Voidborn"
 Born out of the void
 Amidst the stars of flesh
@@ -41,6 +41,28 @@ Amidst the stars of flesh
 
 Gazes into the weary eyes of a lost stalker
 """
+
+POEM_WITH_EMPTY_LINES = """
+Born out of the void
+Amidst the stars of flesh
+An illusion both full and empty
+O'er the abyss' watchful maw
+
+Gazes into the weary eyes of a lost stalker
+
+
+
+"""
+
+POEM_WITH_EXTRA_WHITESPACE = """
+ Born out of the void 
+Amidst the stars of flesh
+ An illusion both full and empty   
+  O'er the abyss' watchful maw  
+
+   Gazes into the weary eyes of a lost stalker
+"""
+
 
 
 @pytest.fixture
@@ -100,3 +122,24 @@ class TestParseIntoStanzas:
         stanzas = parse_into_stanzas(poem_text, poem_filename)
         first_line = stanzas[0].lines[0].text.strip()
         assert first_line.startswith("Born out of the void"), f"Failed for: {description}"
+
+    @pytest.mark.parametrize("poem_text,description", [
+        (POEM_WITH_EMPTY_LINES, "empty lines"),
+    ])
+    def test_empty_lines_are_do_not_return_empty_line_objects(self, poem_text, description, poem_filename):
+        """Empty lines should be ignored."""
+        stanzas = parse_into_stanzas(poem_text, poem_filename)
+        assert len(stanzas) == 2, f"Failed for: {description}"
+        assert len(stanzas[0].lines) == 4, f"Failed for: {description}"
+        assert len(stanzas[1].lines) == 1, f"Failed for: {description}"
+
+    @pytest.mark.parametrize("poem_text,description", [
+        (POEM_WITH_EXTRA_WHITESPACE, "extra whitespace"),
+    ])
+    def test_extra_whitespace_is_stripped(self, poem_text, description, poem_filename):
+        """Extra whitespace should be stripped."""
+        stanzas = parse_into_stanzas(poem_text, poem_filename)
+        assert len(stanzas) == 2, f"Failed for: {description}"
+        assert len(stanzas[0].lines) == 4, f"Failed for: {description}"
+        assert len(stanzas[1].lines) == 1, f"Failed for: {description}"
+
