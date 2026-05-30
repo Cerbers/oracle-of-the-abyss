@@ -22,11 +22,21 @@ POETIC_ANALYZERS = {
 }
 
 
-# TODO: break the analyze_poem to create pipeline for anlysis efficiently
+
 @watch_running_time_of_function
 def analyze_poem(poem: Poem) -> AnalysisResult:
     """
-    Analyze poem using domain objects.
+    Analysis orchestration function. Calls create_analysis_baseline to get baseline data
+    and then analyzes each stanza for poetic devices.
+
+    Args:
+        poem: The poem to analyze
+
+    Returns:
+        AnalysisResult: Dictionary containing baseline data and poetic device analysis
+
+    Note:
+        This function is meant for organizing the analysis process.
     """
     analysis_baseline = create_analysis_baseline(poem)
     
@@ -46,7 +56,11 @@ def analyze_poem(poem: Poem) -> AnalysisResult:
 # TODO: Add tests
 def create_analysis_baseline(poem: Poem) -> AnalysisResult:
     """
-    Only the fast structural stuff. Poetic analyses are moved to the parallel runner.
+    Creates baseline analysis data for a poem. Baseline data is a dictionary containing:
+    - stanza_texts: list of stanza text strings
+    - line_counts: list of line counts per stanza
+    - syllables_per_line: list of syllable counts per line per stanza
+    - poetic_devices: empty list to be filled with poetic device analysis
     """
     stanza_texts: list[str] = []
     line_counts: list[int] = []

@@ -19,6 +19,7 @@ class Word:
 
     Methods:
         syllable_variants: Returns a list of possible syllable counts for the word.
+        phonemes: Returns a nested list with phonemes
 
     Note:
         The syllable_variants property returns a list of possible syllable counts
@@ -29,12 +30,23 @@ class Word:
 
     @property
     def syllable_variants(self) -> list[int]:
-        """Returns a list of possible syllable counts for the word."""
+        """Returns a list of possible syllable counts for the word.
+        
+        Example:
+            >>> my_word = Word("hello")
+            >>> my_word.syllable_variants
+            [2, 2]"""
         return count_syllables(self.text)
 
     @property
     def phonemes(self) -> list[list[str]]:
-        """Returns CMU pronunciations for the word (phonetic container)."""
+        """Returns CMU pronunciations for the word (phonetic container).
+        
+        Example:
+            >>> my_word = Word("hello")
+            >>> my_word.phonemes
+            [['HH', 'AH0', 'L', 'OW1'], ['HH', 'EH0', 'L', 'OW1']]
+        """
         return get_phonemes(self.text)
 
 
