@@ -24,7 +24,7 @@ CONSONANTS = "bcdfghjklmnpqrstvwxyz"
 LETTERS = VOWELS + CONSONANTS
 
 # TODO: Check if this function is being tested
-def get_phonemes(word: str) -> list[list[str]] :
+def get_phonemes(word: str) -> list[list[str]] | None :
     """
     Returns CMU pronunciations for a word as a list of phoneme lists.
 

@@ -20,6 +20,9 @@ def detect_rhymes(poem_stanza: Stanza) -> list[str]:
           - [pattern]              e.g. ["ABCD"]    
           - [pattern, name]        e.g. ["AABB", "Rhyming Couplets"]
         Returns empty list for stanzas with fewer than 2 lines.
+    
+    Note:
+        - "7" is used as an indicator for words that are NOT in CMU dictionary.
     """
     if len(poem_stanza.lines) < 2:
         return []
@@ -37,8 +40,10 @@ def detect_rhymes(poem_stanza: Stanza) -> list[str]:
     sound_to_letter: dict[str, str] = {}
     LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for sound in sounds:
+        if sound == "7":
+            sound_to_letter[sound] = "7"
         # print(f"Sound: {sound}")
-        if sound not in sound_to_letter:
+        elif sound not in sound_to_letter:
             sound_to_letter[sound] = LETTERS[len(sound_to_letter)]
             # print(f"Sound to letter: {sound_to_letter}")
 
@@ -70,6 +75,7 @@ def _rhyme_sound(word_text: str) -> str:
                 result = ' '.join(phones[i:])
                 # print(f"Result: {result}")
                 return result
+    return "7"
 
 
 

@@ -39,7 +39,7 @@ class Word:
         return count_syllables(self.text)
 
     @property
-    def phonemes(self) -> list[list[str]]:
+    def phonemes(self) -> list[list[str]] | None:
         """Returns CMU pronunciations for the word (phonetic container).
         
         Example:
