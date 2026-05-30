@@ -33,7 +33,7 @@ def get_phonemes(word: str) -> list[list[str]] :
 
     Returns:
         A list of pronunciations; each pronunciation is a list of phoneme strings.
-        Returns an empty list if the word is not in the CMU dictionary.
+        Returns None value if the word is not in the CMU dictionary.
     
     Example:
     >>> get_phonemes("hello")
@@ -42,7 +42,7 @@ def get_phonemes(word: str) -> list[list[str]] :
     word_lower = word.lower().strip(".,;:!?\"'()[]{}#*_")
     if word_lower in DICTIONARY_CMUDICT:
         return DICTIONARY_CMUDICT[word_lower]
-    return []
+    return None
 
 
 def count_phonetically(word: str) -> list[int]:

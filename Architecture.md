@@ -41,6 +41,10 @@ graph TB
         4f["4f: vowel iteration"]
     end
    
+    subgraph PoeticDevices["Poetic Devices"]
+        5a["5a: analysis/ folder"]
+    end
+   
     subgraph Frontend["Frontend React"]
         6a["6a: handleSubmit"]
         6c["6c: API URL resolution"]
@@ -74,6 +78,7 @@ graph TB
     5a -->|iterates poems| 1c
     1c -->|analyzes| 1d
     1d -->|extracts syllables| 1e
+    1c -->|detects poetic devices| 5a
    
     1a -->|creates Poem object| 2a
     2a -->|triggers stanzas property| 2c
@@ -122,6 +127,7 @@ graph TB
     style Parsing fill:#22c55e,stroke:#15803d,stroke-width:3px,color:#000
     style SyllableLogic fill:#fbbf24,stroke:#b45309,stroke-width:3px,color:#000
     style CMUDict fill:#fb923c,stroke:#c2410c,stroke-width:3px,color:#000
+    style PoeticDevices fill:#ef4444,stroke:#991b1b,stroke-width:3px,color:#fff
     style Frontend fill:#ec4899,stroke:#be185d,stroke-width:3px,color:#fff
     style Integration fill:#06b6d4,stroke:#0e7490,stroke-width:3px,color:#000
     style Deployment fill:#a855f7,stroke:#7e22ce,stroke-width:3px,color:#fff
@@ -137,6 +143,7 @@ graph TB
 - `domain_objects.py` - Word, Line, Stanza models
 - `syllable_counter.py` - CMU dictionary + fallback logic
 - `main.py` - CLI entry point
+- `analysis\*.py` - Analysis modules (anaphora, rhymes, etc.)
 
 **Frontend (React/Vite)**
 - `App.jsx` - Main application component
@@ -283,7 +290,7 @@ Last updated: January 2026 (web architecture expansion)
 
 ## 4. Current Architectural Overview
 
-### CLI Flow (original)
+### CLI Flow
 ```
 poems/*.txt
   → read_poem_folder_and_return_names()
@@ -294,7 +301,7 @@ poems/*.txt
   → write analysis.txt
 ```
 
-### Web Flow (new)
+### Web Flow
 ```
 React Frontend (Vite + Tailwind)
   → axios POST /analyze
@@ -308,18 +315,20 @@ React Frontend (Vite + Tailwind)
 ```
 Docker multi-stage build:
   Stage 1: Node 20 → build React frontend → /dist
-  Stage 2: Python 3.12-slim → FastAPI + /dist → single container
+  Stage 2: Python 3.13-slim → FastAPI + /dist → single container
   → Render (or any container platform)
 ```
 
 Core layers:
 - **Domain layer** — `Poem`, `Stanza`, `Line`, `Word` (dataclasses)
-- **Analysis layer** — syllable counting (future: meter/rhyme detection)
+- **Analysis layer** — syllable counting, rhyme detection (future: poetic devices and meter)
 - **API layer** — FastAPI endpoints, Pydantic request/response models
 - **Frontend layer** — React components, Tailwind styling
 - **Infrastructure layer** — file I/O (CLI), static file serving (web), Docker packaging
 
+
 ## 5. Key Architectural Decisions
+
 
 ### ADR-001: Introducing Domain Objects
 - **Context**  
@@ -337,6 +346,7 @@ Core layers:
   - Positive: modularity, better testability, easier to add features (e.g. `get_all_syllable_variants()`)  
   - Negative: slightly more code upfront, small performance overhead (acceptable for this scale)  
   - Allowed splitting `get_total_syllables()` and `get_all_syllable_variants()` instead of union return types
+
 
 ### ADR-002: Test-Informed Development Instead of Strict TDD
 - **Context**  
@@ -376,6 +386,7 @@ Core layers:
 - **Consequences**
   Public API is simpler and more type-safe. Internal implementation can change without affecting callers. Slightly more methods, but each has clear intent.
 
+
 ### ADR-004: Adding FastAPI as Web Backend
 
 - **Context**
@@ -397,6 +408,7 @@ Core layers:
   - Negative: additional dependencies (fastapi, uvicorn, pydantic)
   - API layer is intentionally thin — no business logic lives there
 
+
 ### ADR-005: Adding React + Vite Frontend
 
 - **Context**
@@ -416,6 +428,7 @@ Core layers:
   - Positive: frontend and backend can be developed/tested independently
   - Negative: JavaScript toolchain complexity (node_modules, build step)
   - Acceptable: frontend is intentionally simple — no routing, no state management library
+
 
 ### ADR-006: Docker for Deployment
 
@@ -437,6 +450,54 @@ Core layers:
   - Negative: need to maintain Dockerfile, slightly more setup than platform defaults
   - Acceptable: Dockerfile is straightforward and well-documented
 
+
+### ADR-007: Poetic Devices Folder Structure
+
+- **Context**
+  Needed to add more poetic devices to the analysis
+
+- **Decision**
+  Added anaphora and rhymes detection to the analysis folder, keeping at this point one file per poetic device
+
+- **Rationale**
+  - Keeps code organized
+  - Easy to collapse into fewer files if needed
+  - Each file is self-contained and easy to understand
+
+- **Consequences**
+  - Positive: easy to understand and maintain
+  - Positive: easy to collapse into fewer files if needed
+  - Positive: easy to keep tests organized
+  - Negative: more files to manage
+  - Acceptable: current structure is simple and easy to understand
+
+
+### ADR-007: Rhyme Detection and Phonemes
+
+- **Context**
+  Needed to add rhyme detection to the analysis
+
+- **Decision**
+  - Added phoneme extraction to Word object and used it for rhyme detection
+  - Rhyme detection process contained in its own file due to steps needed for it to work
+  - Steps:
+    1. Extract phonemes from words
+    2. Compare phonemes to find rhymes
+    3. Match rhymes in stanzas with patterns
+    4. Return rhymes
+
+- **Rationale**
+  - A word should know what phonemes it contains
+  - Rhyme detection has to be reliable for perfect rhymes (not accounting for slant rhymes yet at this point)
+  - Rhyme detection needs to be able to match rhymes in stanzas with patterns
+
+- **Consequences**
+  - Positive: rhyme detection is reliable and can be used in the analysis
+  - Negative: rhyme detection is scoped to perfect rhymes only
+  - Negative: rhyme detection is scoped to stanza level
+
+
+
 ## 6. Testing and Validation Strategy
 
 **Backend (Python):**
@@ -456,32 +517,28 @@ Core layers:
 - Manual browser testing during development
 
 
+
 ## 7. Tradeoffs and Known Limitations
 
 **Core analysis:**
 - English-only (CMUdict) — intentional scope limitation
 - No support for multiple pronunciation selection yet (uses first variant)
-- No rhyme/stress pattern detection (planned)
+- No stress pattern detection (planned)
 - Performance not optimized (irrelevant for <1000 poems)
 - NLTK download required — documented in README
 
 **Web architecture:**
 - Single deployment model (API serves frontend) — simple but limits independent scaling
 - No authentication — intentional for public demo tool
-- No API versioning — will address if breaking changes needed
+- No API versioning — will address when needed
 - Frontend has no tests yet — acceptable for current scope
-- No CLI arguments yet (folder hardcoded with default) — lower priority now that web exists
 
 ## 8. Future Considerations
 
 **Analysis features:**
 - Support multiple pronunciation variants + best-fit meter detection
-- Rhyme scheme detection (end-word phoneme comparison)
 
 **Web/infrastructure:**
 - Add frontend tests (React Testing Library or Playwright)
 - API tests with pytest + httpx
 - Consider API versioning if public usage grows
-
-**Lower priority (now that web exists):**
-- CLI arguments (`argparse` or `typer`): folder, output format, options

@@ -55,8 +55,7 @@ def _rhyme_sound(word_text: str) -> str:
 
     Uses CMU phonemes when available: returns the phoneme sequence from the
     last stressed vowel (phoneme ending in '0', '1' or '2') to the end of the
-    first pronunciation.  Falls back to the last two characters of the
-    stripped, lowercased word.
+    first pronunciation.  
     """
     
     word = Word(text=word_text)
@@ -71,9 +70,7 @@ def _rhyme_sound(word_text: str) -> str:
                 result = ' '.join(phones[i:])
                 # print(f"Result: {result}")
                 return result
-    # fallback: last two characters
-    stripped = word_text.lower().strip('.,!?":;\'')
-    return stripped[-2:] if len(stripped) >= 2 else stripped
+
 
 
 def _name_scheme(pattern: str) -> str:

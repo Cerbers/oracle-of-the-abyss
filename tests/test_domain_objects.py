@@ -1,6 +1,9 @@
 import pytest
 
 from oracle.domain_objects import Word, Line, Stanza
+### ------------------- ###
+# Word object tests
+### ------------------- ###
 
 def test_word_object():
     """Test the Word dataclass instantiation and properties."""
@@ -12,12 +15,24 @@ def test_word_syllable_variants():
     case_word = Word(text="rhythm")
     assert case_word.syllable_variants == [2], "Word syllable variants do not match expected value."
 
+@pytest.mark.parametrize("word,expected", [
+    ("rhythm", [['R', 'IH1', 'DH', 'AH0', 'M']]),
+    ("hello", [['HH', 'AH0', 'L', 'OW1'], ['HH', 'EH0', 'L', 'OW1']]),
+    ("o'er", None),
+])
+def test_word_phonemes(word, expected):
+    """Test the phonemes property of the Word dataclass."""
+    case_word = Word(text=word)
+    assert case_word.phonemes == expected, "Word phonemes do not match expected value."
+
+### ------------------- ###
+# Line object tests
+### ------------------- ###
 
 def test_line_object():
     """Test the Line dataclass instantiation and properties."""
     case_line = Line(text="Born out of the void")
     assert case_line.text == "Born out of the void", "Line text does not match."
-
 
 def test_line_breaks_line_string_into_words():
     """Test that Line breaks its text into Word objects correctly."""
@@ -44,27 +59,6 @@ def test_line_is_not_empty():
     with pytest.raises(ValueError, match="Line text cannot be empty"):
         Line(text="")
 
-
-def test_stanza_object():
-    """Test the Stanza dataclass instantiation and properties."""
-    case_stanza = Stanza(lines=[Line(text="Line one."), Line(text="Line two.")])
-
-    assert len(case_stanza.lines) == 2, "Stanza does not contain the expected number of lines."
-    assert case_stanza.lines[0].text == "Line one.", "First line text does not match."
-    assert case_stanza.lines[1].text == "Line two.", "Second line text does not match."
-
-def test_stanza_lines_are_line_objects():
-    """Test that Stanza lines are instances of Line dataclass."""
-    case_stanza = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
-
-    for line in case_stanza.lines:
-        assert isinstance(line, Line), "Stanza lines should be instances of Line dataclass."
-
-def test_stanza_is_not_empty():
-    """Test that Stanza can be instantiated with an empty list of lines."""
-    with pytest.raises(ValueError, match="Stanza must contain at least one Line"):
-        Stanza(lines=None)
-
 def test_line_get_syllable_counts_returns_per_word_counts():
     """Test that the line count function returns the correct number of syllable in each word in a line."""
     
@@ -79,16 +73,6 @@ def test_line_get_syllable_counts_returns_per_word_counts():
 
     expected_syllable_counts_2 = [1, 1, 1, 1, 1, 1, 1, 1]
     assert test_count_2 == expected_syllable_counts_2, "Line syllable variants do not match expected values."
-
-def test_stanza_has_text_representation_by_merging_lines():
-    """Test that Stanza can merge its lines into a single text representation."""
-
-
-    case_stanza_lines = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
-    stanza_text = case_stanza_lines.stanza_text_string
-    expected_text = "First line.\nSecond line."
-    assert stanza_text == expected_text, "Stanza text representation does not match expected value."
-
 
 def test_line_get_unique_variants():
     """Test that _get_unique_variants removes duplicates while preserving order."""
@@ -160,3 +144,39 @@ def test_line_all_variants_edge_cases():
     case_line_simple = Line(text="test")  # test=[1]
     variants_simple = case_line_simple.get_all_syllable_variants()
     assert variants_simple == [[1]]
+
+### ------------------- ###
+# Stanza object tests
+### ------------------- ###
+
+def test_stanza_object():
+    """Test the Stanza dataclass instantiation and properties."""
+    case_stanza = Stanza(lines=[Line(text="Line one."), Line(text="Line two.")])
+
+    assert len(case_stanza.lines) == 2, "Stanza does not contain the expected number of lines."
+    assert case_stanza.lines[0].text == "Line one.", "First line text does not match."
+    assert case_stanza.lines[1].text == "Line two.", "Second line text does not match."
+
+def test_stanza_lines_are_line_objects():
+    """Test that Stanza lines are instances of Line dataclass."""
+    case_stanza = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
+
+    for line in case_stanza.lines:
+        assert isinstance(line, Line), "Stanza lines should be instances of Line dataclass."
+
+def test_stanza_is_not_empty():
+    """Test that Stanza can be instantiated with an empty list of lines."""
+    with pytest.raises(ValueError, match="Stanza must contain at least one Line"):
+        Stanza(lines=None)
+
+
+def test_stanza_has_text_representation_by_merging_lines():
+    """Test that Stanza can merge its lines into a single text representation."""
+
+
+    case_stanza_lines = Stanza(lines=[Line(text="First line."), Line(text="Second line.")])
+    stanza_text = case_stanza_lines.stanza_text_string
+    expected_text = "First line.\nSecond line."
+    assert stanza_text == expected_text, "Stanza text representation does not match expected value."
+
+
