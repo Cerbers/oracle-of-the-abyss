@@ -2,13 +2,14 @@
 Module for domain objects used in poem analysis.
 """
 
-
 from dataclasses import dataclass
-from oracle.syllable_counter import count_syllables, get_phonemes
 from typing import cast
 
+from oracle.syllable_counter import count_syllables, get_phonemes
 
-# TODO: Update Word class docs
+
+
+
 @dataclass
 class Word:
     """

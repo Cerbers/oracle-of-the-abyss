@@ -1,6 +1,7 @@
 from pathlib import Path
+
 from oracle.poem_model import Poem
-from oracle.analyzer import analyze_poem
+from oracle.analyzer import analyze_poem, create_analysis_baseline
 
 
 # TODO expand test cases for edge cases
@@ -36,3 +37,33 @@ def test_analyze_poem_has_stanzas_in_list():
     }
     
     assert analysis == expected, f"Poem analysis did not match expected output. Instead got: {analysis}"
+
+
+
+def test_create_analysis_baseline():
+    """Test the create_analysis_baseline function returns the correct structure."""
+    
+    poem = """"Voidborn"
+    Born out of the void
+    Amidst the stars of flesh
+    An illusion both full and empty
+    O'er the abyss' watchful maw
+    
+    Gazes into the weary eyes of a lost stalker
+    Who lies in blood-flow of the night
+    """
+    
+    poem_obj = Poem(text=poem, filepath=Path("test_poem.txt"))
+    analysis = create_analysis_baseline(poem_obj)
+    
+    expected = {
+        'stanza_texts': [
+            "Born out of the void\nAmidst the stars of flesh\nAn illusion both full and empty\nO'er the abyss' watchful maw",
+            "Gazes into the weary eyes of a lost stalker\nWho lies in blood-flow of the night"
+        ],
+        'line_counts': [4, 2],
+        'syllables_per_line': [[5, 6, 9, 7], [13, 8]],
+        'poetic_devices': []
+    }
+    
+    assert analysis == expected, f"Analysis baseline did not match expected output. Instead got: {analysis}"
