@@ -66,7 +66,7 @@ def read_poem_file_and_return_content(file_path: str) -> str | None:
 
 # TODO: figure out where poetic devices should be handled and how should they be printed
 
-def write_poem_analysis(file_path: str) -> None:
+def write_poem_analysis(file_path: str, output_folder_path: str | None = None) -> None:
     """
     Analyzes a poem and writes the results to a text file.
     """
@@ -82,7 +82,13 @@ def write_poem_analysis(file_path: str) -> None:
 
     analysis_result = analyze_poem(poem_obj)
     
-    output_path = input_path.with_name(input_path.stem + "_analysis.txt")
+    if output_folder_path is None:
+        output_path = input_path.with_name(input_path.stem + "_analysis.txt")
+    else:
+        output_dir = Path(output_folder_path)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / f"{input_path.stem}_analysis.txt"
+    
     with open(output_path, 'w', encoding='utf-8') as file:
         for i, (text, line_count, syllables, poetic_data) in enumerate(
             zip(
@@ -104,7 +110,9 @@ def write_poem_analysis(file_path: str) -> None:
 
 # TODO: make program not crash when one file is corrupted
 @watch_running_time_of_function
-def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems") -> None:
+def read_multiple_poem_files_and_write_analyses(
+    folder_path: str = "user poems", 
+    output_folder_path: str | None = None) -> None:
     """
     Processes all poem files in a folder and generates analysis files.
     
@@ -130,10 +138,9 @@ def read_multiple_poem_files_and_write_analyses(folder_path: str = "user poems")
     for poem_file_name in poem_file_names:
         poem_file_path = folder / poem_file_name
         # print(f"Processing {poem_file_name}...")
-        write_poem_analysis(str(poem_file_path))
+        write_poem_analysis(str(poem_file_path), output_folder_path=output_folder_path)
         # print(f"Finished processing {poem_file_name}.")
 
-# TODO: Add option to choose target folder for analyzed poems, by default it's same as read folder
 if __name__ == "__main__":
     import argparse
     import os
@@ -141,9 +148,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Oracle of the Abyss - Poem Analyzer")
     parser.add_argument("--perf", action="store_true", help="Enable performance monitoring")
     parser.add_argument("--folder", type=str, default="user poems", help="Folder containing poems (relative or absolute path)")
+    parser.add_argument("--output-folder", type=str, default=None, help="Folder to save analysis files (relative or absolute path)")
     args = parser.parse_args()
 
     if args.perf:
         os.environ["ORACLE_LOOKOUT"] = "1"
 
-    read_multiple_poem_files_and_write_analyses(folder_path=args.folder)
+    read_multiple_poem_files_and_write_analyses(
+        folder_path=args.folder,
+        output_folder_path=args.output_folder,)

@@ -145,3 +145,23 @@ def test_read_multiple_poem_files_with_empty_folder(tmp_path, monkeypatch):
     # No analysis files should be created
     analysis_files = list(empty_folder.glob("*_analysis.txt"))
     assert len(analysis_files) == 0, "No analysis files should be created for empty folder"
+
+def test_read_poems_from_chosen_folder_and_write_to_another(tmp_path, monkeypatch):
+    """Test that function reads poems from a chosen folder and writes analysyses into another 
+    chosen folder using --arguments"""
+
+    monkeypatch.chdir(tmp_path)
+    folder_a = tmp_path / "folder A"
+    folder_a.mkdir()
+    (folder_a / "poem1.txt").write_text("Some poem content")
+    folder_b = tmp_path / "folder B"
+    folder_b.mkdir()
+
+    # call the function with arguments
+    read_multiple_poem_files_and_write_analyses(folder_path=str(folder_a), output_folder_path=str(folder_b))
+    
+    # check that analysis file was created in folder B
+    analysis_file = folder_b / "poem1_analysis.txt"
+    assert analysis_file.exists(), "Analysis file should be created in the output folder"
+    assert analysis_file.read_text() != "", "Analysis file should not be empty"
+
