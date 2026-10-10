@@ -5,10 +5,9 @@ API module for the Oracle Poetry Analyzer.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-
 from pydantic import BaseModel
-from pathlib import Path
 
+from pathlib import Path
 from typing import TypeAlias
 
 from oracle.analyzer import analyze_poem, AnalysisResult

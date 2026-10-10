@@ -6,7 +6,7 @@ from pathlib import Path
 
 def test_read_poem_folder_and_return_names_excludes_analysis_files(tmp_path):
     """Test that analysis files are excluded when reading poem folder."""
-    # Create poem files and analysis files
+    
     (tmp_path / "poem1.txt").write_text("Some poem content")
     (tmp_path / "poem2.txt").write_text("Another poem")
     (tmp_path / "poem1_analysis.txt").write_text("Analysis of poem1")
@@ -21,7 +21,7 @@ def test_read_poem_folder_and_return_names_excludes_analysis_files(tmp_path):
 
 def test_read_poem_folder_and_return_names(tmp_path):
     """Test reading all poems from a folder."""
-    # Create some poem files
+    
     (tmp_path / "poem1.txt").write_text("First poem")
     (tmp_path / "poem2.txt").write_text("Second poem")
     (tmp_path / "some_analysis.txt").write_text("Should be excluded")
@@ -122,7 +122,6 @@ def test_read_multiple_poem_files_and_write_analyses(tmp_path: Path):
         assert content, f"Analysis file is empty: {analysis_path.name}"
         assert "Stanza" in content, f"Analysis looks invalid: {analysis_path.name}"
 
-    # Optional extra checks
     created_poem_names = {p.stem.removesuffix("_analysis") for p in analysis_files}
     expected = {"poem1", "poem2", "poem3"}
 
@@ -142,7 +141,6 @@ def test_read_multiple_poem_files_with_empty_folder(tmp_path, monkeypatch):
     
     read_multiple_poem_files_and_write_analyses()
     
-    # No analysis files should be created
     analysis_files = list(empty_folder.glob("*_analysis.txt"))
     assert len(analysis_files) == 0, "No analysis files should be created for empty folder"
 
@@ -165,3 +163,12 @@ def test_read_poems_from_chosen_folder_and_write_to_another(tmp_path, monkeypatc
     assert analysis_file.exists(), "Analysis file should be created in the output folder"
     assert analysis_file.read_text() != "", "Analysis file should not be empty"
 
+def test_what_happens_when_poem_text_is_none(tmp_path, monkeypatch):
+    poem = tmp_path / "poem1.txt"
+    poem.write_text("content")
+
+    monkeypatch.setattr("oracle.main.read_poem_file_and_return_content",
+                        lambda path: None)
+    write_poem_analysis(str(poem))
+
+    assert not (tmp_path / "poem1_analysis.txt").exists()

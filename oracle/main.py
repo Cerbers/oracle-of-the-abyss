@@ -74,7 +74,6 @@ def write_poem_analysis(file_path: str, output_folder_path: str | None = None) -
 
 
     poem_text = read_poem_file_and_return_content(file_path)
-    # TODO: add tests for what happens when poem_text is None
     if poem_text is None:
         return
 
