@@ -1,0 +1,43 @@
+stages:
+  - test
+  - lint
+
+variables:
+  POETRY_HOME: "$CI_PROJECT_DIR/.poetry"
+  POETRY_VIRTUALENVS_IN_PROJECT: "true"
+
+cache:
+  key:
+    files:
+      - poetry.lock
+  paths:
+    - .venv/
+    - .poetry/
+
+before_script:
+  - export PATH="$POETRY_HOME/bin:$PATH"
+  - if [ ! -f "$POETRY_HOME/bin/poetry" ]; then curl -sSL https://install.python-poetry.org | python3 -; fi
+  - poetry config virtualenvs.in-project true
+  - poetry install --with dev
+
+test:
+  stage: test
+  script:
+    - export PATH="$POETRY_HOME/bin:$PATH"
+    - poetry run pytest --cov --cov-report=xml
+  tags:
+    - linux
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+
+mypy:
+  stage: lint
+  script:
+    - export PATH="$POETRY_HOME/bin:$PATH"
+    - poetry run mypy oracle/ --strict
+  tags:
+    - linux
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
