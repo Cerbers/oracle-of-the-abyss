@@ -1,6 +1,8 @@
 from oracle.main import read_poem_file_and_return_content, write_poem_analysis, read_poem_folder_and_return_names, \
 read_multiple_poem_files_and_write_analyses
 from pathlib import Path
+import pytest
+
 
 
 
@@ -172,3 +174,33 @@ def test_what_happens_when_poem_text_is_none(tmp_path, monkeypatch):
     write_poem_analysis(str(poem))
 
     assert not (tmp_path / "poem1_analysis.txt").exists()
+
+
+
+######
+## Tests for folder paths
+######
+
+BAD_VALUES = [
+    "nonexistent_folder",
+    "",
+    "   ",
+    "\t\n ",
+]
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        # only input is bad
+        *[{"folder_path": v} for v in BAD_VALUES],
+        # only output is bad
+        *[{"output_folder_path": v} for v in BAD_VALUES],
+        # both are bad (all combinations)
+        *[{"folder_path": a, "output_folder_path": b} for a in BAD_VALUES for b in BAD_VALUES],
+    ],
+    ids=lambda kwargs: "_".join(f"{k}={v!r}" for k, v in kwargs.items()),
+)
+def test_invalid_folder_paths(kwargs):
+    with pytest.raises(ValueError):
+        read_multiple_poem_files_and_write_analyses(**kwargs)
+        

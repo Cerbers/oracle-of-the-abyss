@@ -2,6 +2,7 @@
 Main module for the Oracle Poetry Analyzer.
 """
 from pathlib import Path
+import sys
 
 
 from oracle.analyzer import analyze_poem
@@ -107,7 +108,24 @@ def write_poem_analysis(file_path: str, output_folder_path: str | None = None) -
                 if value:   # only print if we actually found something
                     file.write(f"{name.capitalize()}: {value}\n\n")
 
-# TODO: make program not crash when one file is corrupted
+
+def _validate_folder(path_value: str | None, *, name:str, required:bool) -> Path | None:
+    if path_value is None:
+        if required:
+            raise ValueError(f"The {name} folder path is required.")
+        return None
+    if not isinstance(path_value, str):
+        raise ValueError(f" The {name} folder path must be a string, not {type(path_value).__name__}")
+    if path_value.strip() == "":
+        raise ValueError(f"The {name} folder path cannot be empty.")
+    
+    folder = Path(path_value)
+    if not folder.exists() or not folder.is_dir():
+        raise ValueError(f"The {name} folder path does not exist or is not a directory.")
+    return folder
+
+
+
 @watch_running_time_of_function
 def read_multiple_poem_files_and_write_analyses(
     folder_path: str = "user poems", 
@@ -122,11 +140,13 @@ def read_multiple_poem_files_and_write_analyses(
         Skips files ending with '_analysis.txt' to avoid reprocessing.
         Prints progress and error messages to console.
     """
-
-    folder = Path(folder_path)
-    if not folder.exists() or not folder.is_dir():
-        print(f"Error: The directory '{folder_path}' does not exist or is not a directory.")
-        return
+    input_folder = _validate_folder(folder_path, name="input", required=True)
+    # mypy compliance
+    if input_folder is None:
+        raise ValueError("The input folder path is required.")
+    output_folder = _validate_folder(output_folder_path, name="output", required=False)
+    if output_folder is None:
+        output_folder = input_folder
 
     poem_file_names = read_poem_folder_and_return_names(folder_path)
 
@@ -135,9 +155,9 @@ def read_multiple_poem_files_and_write_analyses(
         return
 
     for poem_file_name in poem_file_names:
-        poem_file_path = folder / poem_file_name
+        poem_file_path = input_folder / poem_file_name
         # print(f"Processing {poem_file_name}...")
-        write_poem_analysis(str(poem_file_path), output_folder_path=output_folder_path)
+        write_poem_analysis(str(poem_file_path), output_folder_path=str(output_folder))
         # print(f"Finished processing {poem_file_name}.")
 
 if __name__ == "__main__":
@@ -153,6 +173,10 @@ if __name__ == "__main__":
     if args.perf:
         os.environ["ORACLE_LOOKOUT"] = "1"
 
-    read_multiple_poem_files_and_write_analyses(
-        folder_path=args.folder,
-        output_folder_path=args.output_folder,)
+    try:
+        read_multiple_poem_files_and_write_analyses(
+            folder_path=args.folder,
+            output_folder_path=args.output_folder,)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
